@@ -1,7 +1,8 @@
-package model;
+package equalizer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Task { 
+public class Activity { 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,13 +20,11 @@ public class Task {
 	@ManyToOne
 	private Person owner;
 	
-	@ManyToOne
-	private Activity activity;
-	
 	private String name;
 	private String modified;
-	private boolean calculated;
-	private double ammount;
+	private Date date;
+	private boolean calculated = false;
+	private double total = 0.0;
 		
 	public String getname() {
 		return name;
@@ -63,6 +62,15 @@ public class Task {
 		updateModified();
 	}
 
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+		updateModified();
+	}
+
 	public boolean isCalculated() {
 		return calculated;
 	}
@@ -72,12 +80,12 @@ public class Task {
 		updateModified();
 	}
 
-	public double getAmmount() {
-		return ammount;
+	public double getTotal() {
+		return total;
 	}
 
-	public void setAmmount(double ammount) {
-		this.ammount = ammount;
+	public void setTotal(double total) {
+		this.total = total;
 		updateModified();
 	}
 

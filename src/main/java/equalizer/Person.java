@@ -1,4 +1,4 @@
-package model;
+package equalizer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
