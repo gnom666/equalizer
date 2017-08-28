@@ -3,12 +3,19 @@ package equalizer;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Entity
 public class Activity { 
@@ -20,12 +27,32 @@ public class Activity {
 	@ManyToOne
 	private Person owner;
 	
+	
+	@ManyToMany(cascade = CascadeType.ALL)
+	private Set<Person> persons;
+	
+	@OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
+	private Set<Task> tasks;
+	
 	private String name;
 	private String modified;
 	private Date date;
 	private boolean calculated = false;
 	private double total = 0.0;
 		
+	public long getId() {
+		return id;
+	}
+	
+	public Set<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(Set<Task> tasks) {
+		this.tasks = tasks;
+		updateModified();
+	}
+
 	public String getname() {
 		return name;
 	}
@@ -86,6 +113,15 @@ public class Activity {
 
 	public void setTotal(double total) {
 		this.total = total;
+		updateModified();
+	}
+	
+	public Set<Person> getPersons() {
+		return persons;
+	}
+
+	public void setPersons(Set<Person> persons) {
+		this.persons = persons;
 		updateModified();
 	}
 

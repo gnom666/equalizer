@@ -9,6 +9,8 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(collectionResourceRel = "people", path = "people")
 public interface PersonRepository extends PagingAndSortingRepository<Person, Long> {
 
+	Person findById(@Param("id") Long id);
+	
 	List<Person> findByLastName(@Param("name") String name);
 	
 	List<Person> findByFirstName(@Param("name") String name);

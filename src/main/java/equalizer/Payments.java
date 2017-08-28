@@ -10,69 +10,34 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class Task { 
+public class Payments { 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
 	@ManyToOne
-	private Person owner;
+	private Person from;
+	
+	@ManyToOne
+	private Person to;
 	
 	@ManyToOne
 	private Activity activity;
 	
-	private String name;
 	private String modified;
-	private boolean calculated;
 	private double ammount;
 		
 	public long getId() {
 		return id;
 	}
 	
-	public String getname() {
-		return name;
-	}
-
-	public void setname(String name) {
-		this.name = name;
-		updateModified();
-	}
-
 	public String getModified() {
 		return modified;
 	}
 
 	public void setModified(String modified) {
 		this.modified = modified;
-		updateModified();
-	}
-	
-	public Person getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Person owner) {
-		this.owner = owner;
-		updateModified();
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-		updateModified();
-	}
-
-	public boolean isCalculated() {
-		return calculated;
-	}
-
-	public void setCalculated(boolean calculated) {
-		this.calculated = calculated;
 		updateModified();
 	}
 
@@ -82,6 +47,33 @@ public class Task {
 
 	public void setAmmount(double ammount) {
 		this.ammount = ammount;
+		updateModified();
+	}
+	
+	public Person getFrom() {
+		return from;
+	}
+
+	public void setFrom(Person from) {
+		this.from = from;
+		updateModified();
+	}
+
+	public Person getTo() {
+		return to;
+	}
+
+	public void setTo(Person to) {
+		this.to = to;
+		updateModified();
+	}
+
+	public Activity getActivity() {
+		return activity;
+	}
+
+	public void setActivity(Activity activity) {
+		this.activity = activity;
 		updateModified();
 	}
 
