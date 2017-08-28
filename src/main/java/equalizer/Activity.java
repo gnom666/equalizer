@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -23,23 +24,22 @@ public class Activity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+	
+	private String name;
+	private String modified;
+	private Date date;
+	private boolean calculated;
+	private double total;
 
 	@ManyToOne
 	private Person owner;
-	
-	
+		
 	@ManyToMany(cascade = CascadeType.ALL)
 	private Set<Person> persons;
 	
 	@OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
 	private Set<Task> tasks;
 	
-	private String name;
-	private String modified;
-	private Date date;
-	private boolean calculated = false;
-	private double total = 0.0;
-		
 	public long getId() {
 		return id;
 	}
@@ -53,22 +53,12 @@ public class Activity {
 		updateModified();
 	}
 
-	public String getname() {
-		return name;
-	}
-
-	public void setname(String name) {
-		this.name = name;
-		updateModified();
-	}
-
 	public String getModified() {
 		return modified;
 	}
 
 	public void setModified(String modified) {
 		this.modified = modified;
-		updateModified();
 	}
 	
 	public Person getOwner() {
