@@ -36,6 +36,9 @@ public class Activity {
 	@OneToMany(mappedBy = "activity")
 	private Set<Task> tasks;
 	
+	@OneToMany(mappedBy = "activity")
+	private Set<Payments> payments;
+	
 	private String name;
 	private String modified;
 	private Date date;
@@ -47,12 +50,22 @@ public class Activity {
 		return id;
 	}
 
+	public Set<Payments> getPayments() {
+		return payments;
+	}
+
+	public void setPayments(Set<Payments> payments) {
+		this.payments = payments;
+		updateModified();
+	}
+
 	public Date getDate() {
 		return date;
 	}
 
 	public void setDate(Date date) {
 		this.date = date;
+		updateModified();
 	}
 	
 	public Set<Task> getTasks() {

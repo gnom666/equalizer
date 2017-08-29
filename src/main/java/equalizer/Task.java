@@ -34,6 +34,15 @@ public class Task {
 		return id;
 	}
 	
+	public Activity getActivity() {
+		return activity;
+	}
+
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+		updateModified();
+	}
+
 	public String getname() {
 		return name;
 	}

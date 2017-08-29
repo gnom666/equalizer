@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -17,12 +18,15 @@ public class Payments {
 	private long id;
 
 	@ManyToOne
+	@JoinColumn(name="from_id")
 	private Person from;
 	
 	@ManyToOne
+	@JoinColumn(name="to_id")
 	private Person to;
 	
 	@ManyToOne
+	@JoinColumn(name="activity_id")
 	private Activity activity;
 	
 	private String modified;

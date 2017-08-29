@@ -8,9 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 
@@ -29,6 +27,12 @@ public class Person {
 	
 	@OneToMany(mappedBy = "owner")
 	private Set<Task> tasks;
+	
+	@OneToMany(mappedBy = "from")
+	private Set<Payments> paid;
+	
+	@OneToMany(mappedBy = "to")
+	private Set<Payments> received;
 
 	private String firstName;
 	private String lastName;
@@ -42,6 +46,33 @@ public class Person {
 		return id;
 	}
 	
+	public Set<Task> getTasks() {
+		return tasks;
+	}
+
+	public void setTasks(Set<Task> tasks) {
+		this.tasks = tasks;
+		updateModified();
+	}
+
+	public Set<Payments> getPaid() {
+		return paid;
+	}
+
+	public void setPaid(Set<Payments> paid) {
+		this.paid = paid;
+		updateModified();
+	}
+
+	public Set<Payments> getReceived() {
+		return received;
+	}
+
+	public void setReceived(Set<Payments> received) {
+		this.received = received;
+		updateModified();
+	}
+
 	public int getNumpers() {
 		return numpers;
 	}
