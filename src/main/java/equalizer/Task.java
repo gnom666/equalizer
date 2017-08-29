@@ -43,15 +43,6 @@ public class Task {
 		updateModified();
 	}
 
-	public String getname() {
-		return name;
-	}
-
-	public void setname(String name) {
-		this.name = name;
-		updateModified();
-	}
-
 	public String getModified() {
 		return modified;
 	}
