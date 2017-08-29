@@ -16,32 +16,43 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 @Entity
 public class Activity { 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
+
+	@ManyToOne
+    @JoinColumn(name="owner_id")
+    private Person owner;
+		
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(	name = "person_activity", 
+				joinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"), 
+				inverseJoinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"))
+	private Set<Person> participants;
+	
+	@OneToMany(mappedBy = "activity")
+	private Set<Task> tasks;
 	
 	private String name;
 	private String modified;
 	private Date date;
-	private boolean calculated;
-	private double total;
-
-	@ManyToOne
-	private Person owner;
+	
+	private boolean calculated = false;
+	private double total = 0.0;
 		
-	@ManyToMany(cascade = CascadeType.ALL)
-	private Set<Person> persons;
-	
-	@OneToMany(mappedBy = "activity", cascade = CascadeType.ALL)
-	private Set<Task> tasks;
-	
 	public long getId() {
 		return id;
+	}
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
 	}
 	
 	public Set<Task> getTasks() {
@@ -79,15 +90,6 @@ public class Activity {
 		updateModified();
 	}
 
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-		updateModified();
-	}
-
 	public boolean isCalculated() {
 		return calculated;
 	}
@@ -106,12 +108,12 @@ public class Activity {
 		updateModified();
 	}
 	
-	public Set<Person> getPersons() {
-		return persons;
+	public Set<Person> getParticipants() {
+		return participants;
 	}
 
-	public void setPersons(Set<Person> persons) {
-		this.persons = persons;
+	public void setParticipants(Set<Person> participants) {
+		this.participants = participants;
 		updateModified();
 	}
 

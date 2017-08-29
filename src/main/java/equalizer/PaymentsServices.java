@@ -1,7 +1,5 @@
 package equalizer;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +31,7 @@ public class PaymentsServices {
 		if (act != null && per!= null && per.getId() == act.getOwner().getId()) {
 			ArrayList<Row> table = new ArrayList<>();
 			
-			act.getPersons ().forEach(p->{
+			act.getParticipants().forEach(p->{
 				Row row = new Row();
 				row.idPerson = p.getId();
 				row.numPersons = p.getNumpers();

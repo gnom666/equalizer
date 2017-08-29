@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
@@ -17,10 +18,12 @@ public class Task {
 	private long id;
 
 	@ManyToOne
+	@JoinColumn(name="owner_id")
 	private Person owner;
 	
 	@ManyToOne
-	private Activity activity;
+    @JoinColumn(name="activity_id")
+    private Activity activity;
 	
 	private String name;
 	private String modified;

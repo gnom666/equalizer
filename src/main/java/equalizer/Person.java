@@ -8,7 +8,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 
 @Entity
@@ -18,8 +21,14 @@ public class Person {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
-	@ManyToMany(mappedBy = "persons")
+	@OneToMany(mappedBy = "owner")
+	private Set<Activity> owns;
+	
+	@ManyToMany(mappedBy = "participants")
 	private Set<Activity> activities;
+	
+	@OneToMany(mappedBy = "owner")
+	private Set<Task> tasks;
 
 	private String firstName;
 	private String lastName;
@@ -39,6 +48,15 @@ public class Person {
 
 	public void setNumpers(int numpers) {
 		this.numpers = numpers;
+		updateModified();
+	}
+	
+	public Set<Activity> getOwns() {
+		return owns;
+	}
+
+	public void setOwns(Set<Activity> owns) {
+		this.owns = owns;
 		updateModified();
 	}
 	
