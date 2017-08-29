@@ -1,6 +1,8 @@
 package equalizer;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -23,6 +25,9 @@ public class PaymentsServices {
 	
 	@Autowired
 	private PersonRepository personRepo;
+	
+	@Autowired
+	private PaymentsRepository paymentsRepo;
 	
 	public double round2decimals (double val) {
 		double result = val*100;
@@ -76,8 +81,8 @@ public class PaymentsServices {
 			act.setTotal(totalPaid);
 			double paidPerPerson = round2decimals(totalPaid / totalPers);
 			double penalty = totalPaid - paidPerPerson * totalPers;
-			ArrayList<Node> positives = new ArrayList<>();
-			ArrayList<Node> negatives = new ArrayList<>();
+			Stack<Node> positives = new Stack<>();
+			Stack<Node> negatives = new Stack<>();
 			for (Row r : table) {
 				r.paidPerPerson = r.numPersons * paidPerPerson;
 				r.difference = r.totalPaid - r.paidPerPerson;
@@ -88,7 +93,29 @@ public class PaymentsServices {
 			}
 
 			// determinar pagos
-			int a = 0;
+			Collections.sort(positives);
+			Collections.sort(negatives);
+			while (!positives.isEmpty() && !negatives.isEmpty()) {
+				Node p = positives.peek();
+				Node n = negatives.peek();
+				Payments pay = new Payments();
+				pay.setActivity(act);
+				pay.setFrom(personRepo.findById(n.idPerson));
+				pay.setTo(personRepo.findById(p.idPerson));
+				if (n.ammount <= p.ammount) {
+					pay.setAmmount(n.ammount);
+					positives.peek().ammount -= n.ammount;
+					negatives.pop();
+					if (n.ammount == p.ammount) {
+						positives.pop();
+					}
+				}	else {
+					pay.setAmmount(p.ammount);
+					negatives.peek().ammount -= p.ammount;
+					positives.pop();
+				}
+				paymentsRepo.save(pay);
+			}
 			
 		}
 		
