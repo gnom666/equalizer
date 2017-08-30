@@ -29,14 +29,21 @@ public class PaymentsServices {
 	@Autowired
 	private PaymentsRepository paymentsRepo;
 	
-	public double round2decimals (double val) {
+	public double trunc2decimals (double val) {
 		double result = val*100;
 		result = (double)((int) result);
 		result = result /100;
 		return result;
 	}
 	
-	@RequestMapping(value="/generatepayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	public double round2decimals (double val) {
+		double result = val*100;
+		result = Math.round(result);
+		result = result /100;
+		return result;
+	}
+	
+	@RequestMapping(value="/generatepayments", method=RequestMethod.GET, produces="application/text;charset=UTF-8")
     public String generatePayments(@RequestParam(value="ida", defaultValue="") String idActivity, @RequestParam(value="idp", defaultValue="") String idPerson) {
     	
 		Activity act = activityRepo.findById(Long.decode(idActivity));
@@ -59,40 +66,36 @@ public class PaymentsServices {
 			});
 			
 			// calcular diferencias y totales
-			if (table.isEmpty()) return "No tasks";
+			if (table.isEmpty()) return "No tasks\n";
 			int totalPers = 0;
 			double totalPaid = 0;
-			long maxId = table.get(0).idPerson;
 			long minId = table.get(0).idPerson;
-			double maxPaid = table.get(0).totalPaid;
-			double minPaid = table.get(0).totalPaid;
+			double minPaid = table.get(0).totalPaid / table.get(0).numPersons;
 			for (Row r : table) {
 				totalPers += r.numPersons;
 				totalPaid += r.totalPaid;
-				if (r.totalPaid > maxPaid) {
-					maxPaid = r.totalPaid;
-					maxId = r.idPerson;
-				}
-				if (r.totalPaid < minPaid) {
-					minPaid = r.totalPaid;
-					minId = r.idPerson;
-				}
 			}
 			act.setTotal(totalPaid);
-			double paidPerPerson = round2decimals(totalPaid / totalPers);
-			double penalty = totalPaid - paidPerPerson * totalPers;
+			double paidPerPerson = trunc2decimals(totalPaid / totalPers);
+			double penalty = round2decimals(totalPaid - paidPerPerson * totalPers);
 			Stack<Node> positives = new Stack<>();
 			Stack<Node> negatives = new Stack<>();
 			for (Row r : table) {
 				r.paidPerPerson = r.numPersons * paidPerPerson;
-				r.difference = r.totalPaid - r.paidPerPerson;
-				if (r.idPerson == maxId) r.difference += penalty;
-				if (r.idPerson == minId) r.difference -= penalty; 
+				r.difference = round2decimals(r.totalPaid - r.paidPerPerson);
+				if (r.totalPaid / r.numPersons < minPaid) {
+					minPaid = r.totalPaid / r.numPersons;
+					minId = r.idPerson;
+				}
+			}
+			for (Row r : table) {
+				if (r.idPerson == minId) r.difference = round2decimals(r.difference - penalty);
 				if (r.difference < 0) negatives.add(new Node(r.idPerson, -r.difference));
 				if (r.difference > 0) positives.add(new Node(r.idPerson, r.difference));
 			}
 
 			// determinar pagos
+			StringBuffer sb = new StringBuffer();
 			Collections.sort(positives);
 			Collections.sort(negatives);
 			while (!positives.isEmpty() && !negatives.isEmpty()) {
@@ -102,27 +105,33 @@ public class PaymentsServices {
 				pay.setActivity(act);
 				pay.setFrom(personRepo.findById(n.idPerson));
 				pay.setTo(personRepo.findById(p.idPerson));
-				if (n.ammount <= p.ammount) {
+				if (n.ammount < p.ammount) {
 					pay.setAmmount(n.ammount);
-					positives.peek().ammount -= n.ammount;
+					positives.peek().ammount = round2decimals(positives.peek().ammount - n.ammount);
 					negatives.pop();
-					if (n.ammount == p.ammount) {
-						positives.pop();
-					}
-				}	else {
+				}	else if (n.ammount > p.ammount) {
 					pay.setAmmount(p.ammount);
-					negatives.peek().ammount -= p.ammount;
+					negatives.peek().ammount = round2decimals(negatives.peek().ammount - p.ammount);
 					positives.pop();
+				}	else { // son iguales
+					pay.setAmmount(n.ammount);
+					positives.pop();
+					negatives.pop();
 				}
-				paymentsRepo.save(pay);
+				// persistir
+				if (!act.isCalculated()) {
+					paymentsRepo.save(pay);
+				}
+				sb.append(pay.toStr() + "\n");
 			}
+			if (!positives.isEmpty() || !negatives.isEmpty()) sb.append("Error. One list isn't empty\n");
 			
+			act.setCalculated(true);
+			activityRepo.save(act);
+			return sb.toString();
 		}
 		
-		//p.setEmail("loquesea@algo.com");
-		//person.save(p);
-		
-		return "error";
+		return "Unknown error\n";
     }
 	
 }

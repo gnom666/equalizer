@@ -80,6 +80,12 @@ public class Payments {
 		this.activity = activity;
 		updateModified();
 	}
+	
+	public String toStr () {
+		return "" + from.getFirstName() + "(" + from.getId() + ") -> "
+				  + to.getFirstName() + "(" + to.getId() + ") : " 
+				  + ammount; 
+	}
 
 	private void updateModified() {
 		Calendar cal = Calendar.getInstance();

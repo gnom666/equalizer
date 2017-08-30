@@ -29,8 +29,8 @@ public class Activity {
 		
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(	name = "person_activity", 
-				joinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"), 
-				inverseJoinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"))
+				joinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"), 
+				inverseJoinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"))
 	private Set<Person> participants;
 	
 	@OneToMany(mappedBy = "activity")
