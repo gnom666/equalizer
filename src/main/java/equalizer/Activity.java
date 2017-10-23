@@ -16,6 +16,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
 public class Activity { 
 
@@ -23,19 +26,23 @@ public class Activity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
 	@ManyToOne
     @JoinColumn(name="owner_id")
     private Person owner;
-		
+	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(	name = "person_activity", 
 				joinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"), 
 				inverseJoinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"))
 	private Set<Person> participants;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Task.class)
 	@OneToMany(mappedBy = "activity")
 	private Set<Task> tasks;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
 	@OneToMany(mappedBy = "activity")
 	private Set<Payments> payments;
 	

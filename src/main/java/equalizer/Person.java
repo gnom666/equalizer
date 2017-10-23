@@ -11,6 +11,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 
 @Entity
 public class Person { 
@@ -19,18 +22,23 @@ public class Person {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Activity.class)
 	@OneToMany(mappedBy = "owner")
 	private Set<Activity> owns;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Activity.class)
 	@ManyToMany(mappedBy = "participants")
 	private Set<Activity> activities;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Task.class)
 	@OneToMany(mappedBy = "owner")
 	private Set<Task> tasks;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
 	@OneToMany(mappedBy = "from")
 	private Set<Payments> paid;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
 	@OneToMany(mappedBy = "to")
 	private Set<Payments> received;
 
