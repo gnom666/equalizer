@@ -1,6 +1,6 @@
 package equalizer.viewmodel;
 
-import equalizer.model.Payments;
+import equalizer.model.Payment;
 
 public class PaymentOut {
 	
@@ -20,7 +20,7 @@ public class PaymentOut {
 		this.ammount = ammount;
 	}
 	
-	public PaymentOut (Payments payments) {
+	public PaymentOut (Payment payments) {
 		this.id = payments.getId();
 		this.from = payments.getFrom().getId();
 		this.to = payments.getTo().getId();

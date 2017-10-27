@@ -17,10 +17,10 @@ import equalizer.EqualizerConfiguration;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Node;
 import equalizer.controlermodel.Row;
-import equalizer.controlermodel.Constants.ErrorCode;
-import equalizer.controlermodel.Constants.ErrorType;
+import equalizer.controlermodel.Constants;
+import equalizer.controlermodel.Constants.*;
 import equalizer.model.Activity;
-import equalizer.model.Payments;
+import equalizer.model.Payment;
 import equalizer.model.Person;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PaymentsRepository;
@@ -57,10 +57,10 @@ public class PaymentsServices {
 		return result;
 	}
 	
-	private List<Payments> calculatePayments (Activity act, Person per, boolean redo) {
-		List<Payments> generatedPayments = new ArrayList<>();
+	private List<Payment> calculatePayments (Activity act, Person per, boolean redo) {
+		List<Payment> generatedPayments = new ArrayList<>();
 		//* eliminar pagos previos en caso de recalculo
-		List<Payments> deletedPayments = null;
+		List<Payment> deletedPayments = null;
 		if (redo) {
 			deletedPayments = paymentsRepo.removeByActivity(act);
 		}
@@ -119,7 +119,8 @@ public class PaymentsServices {
 		while (!positives.isEmpty() && !negatives.isEmpty()) {
 			Node p = positives.peek();
 			Node n = negatives.peek();
-			Payments pay = new Payments();
+			Payment pay = new Payment();
+			pay.setStatus(PaymentStatus.PENDING);
 			pay.setActivity(act);
 			pay.setFrom(personRepo.findById(n.personId));
 			pay.setTo(personRepo.findById(p.personId));
@@ -199,7 +200,7 @@ public class PaymentsServices {
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.GET)
     public List<PaymentOut> testPaymentsByActivity(@RequestParam(value="aId", defaultValue="") String activityId) {
     	
-		List<Payments> paymentsList = paymentsRepo.findByActivityId(Long.decode(activityId));
+		List<Payment> paymentsList = paymentsRepo.findByActivityId(Long.decode(activityId));
 		ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
 		
 		paymentsList.forEach(p->paymentsOutList.add(new PaymentOut(p)));		
@@ -224,7 +225,7 @@ public class PaymentsServices {
     	
 		Activity activity = activityRepo.findById(Long.decode(activityId));
 		if (activity != null) {
-			List<Payments> paymentsList =  paymentsRepo.removeByActivity(activity);
+			List<Payment> paymentsList =  paymentsRepo.removeByActivity(activity);
 			activity.setCalculated(true);
 			activityRepo.save(activity);
 			ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
@@ -241,7 +242,7 @@ public class PaymentsServices {
     	
 		Person person = personRepo.findById(Long.decode(fromId));
 		if (person != null) {
-			List<Payments> paymentsList = paymentsRepo.findByFrom(person);
+			List<Payment> paymentsList = paymentsRepo.findByFrom(person);
 			if (paymentsList != null) {
 				List<PaymentOut> paymentsOutList = new ArrayList<>();
 				paymentsList.forEach(p->paymentsOutList.add(new PaymentOut(p)));
@@ -261,7 +262,7 @@ public class PaymentsServices {
     	
 		Person person = personRepo.findById(Long.decode(toId));
 		if (person != null) {
-			List<Payments> paymentsList = paymentsRepo.findByTo(person);
+			List<Payment> paymentsList = paymentsRepo.findByTo(person);
 			if (paymentsList != null) {
 				List<PaymentOut> paymentsOutList = new ArrayList<>();
 				paymentsList.forEach(p->paymentsOutList.add(new PaymentOut(p)));
@@ -273,6 +274,105 @@ public class PaymentsServices {
 			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found");
 		}
 				
+		return null;
+    }
+	
+	@RequestMapping(value="/makepay", method=RequestMethod.GET)
+    public PaymentOut makePayment(@RequestParam(value="fId", defaultValue="") String fromId, 
+    		@RequestParam(value="pId", defaultValue="") String paymentId) {
+    	
+		Person person = personRepo.findById(Long.decode(fromId));
+		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
+		if (person != null && payment != null) {
+			if (payment.getFrom().getId() == person.getId()) {
+				payment.setStatus(PaymentStatus.REQUESTED);
+				paymentsRepo.save(payment);
+				return new PaymentOut(payment);
+			}	else {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
+			}
+		}	else {
+			if (payment == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+			}
+			if (person == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+			}
+		}
+		
+		return null;
+    }
+	
+	@RequestMapping(value="/acceptpay", method=RequestMethod.GET)
+    public PaymentOut acceptPayment(@RequestParam(value="tId", defaultValue="") String toId, 
+    		@RequestParam(value="pId", defaultValue="") String paymentId) {
+    	
+		Person person = personRepo.findById(Long.decode(toId));
+		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
+		if (person != null && payment != null) {
+			if (payment.getTo().getId() == person.getId()) {
+				payment.setStatus(PaymentStatus.PAID);
+				paymentsRepo.save(payment);
+				return new PaymentOut(payment);
+			}	else {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
+			}
+		}	else {
+			if (payment == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+			}
+			if (person == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+			}
+		}
+		
+		return null;
+    }
+	
+	@RequestMapping(value="/suepay", method=RequestMethod.GET)
+    public PaymentOut suePayment(@RequestParam(value="tId", defaultValue="") String toId, 
+    		@RequestParam(value="pId", defaultValue="") String paymentId) {
+    	
+		Person person = personRepo.findById(Long.decode(toId));
+		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
+		if (person != null && payment != null) {
+			if (payment.getTo().getId() == person.getId()) {
+				payment.setStatus(PaymentStatus.CONFLICT);
+				paymentsRepo.save(payment);
+				return new PaymentOut(payment);
+			}	else {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
+			}
+		}	else {
+			if (payment == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+			}
+			if (person == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+			}
+		}
+		
+		return null;
+    }
+	
+	@RequestMapping(value="/resetpay", method=RequestMethod.GET)
+    public PaymentOut resetePayment(@RequestParam(value="pId", defaultValue="") String paymentId) {
+    	
+		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
+		if (payment != null) {
+			if (payment.getStatus() != PaymentStatus.PAID) {
+				payment.setStatus(PaymentStatus.PENDING);
+				paymentsRepo.save(payment);
+				return new PaymentOut(payment);
+			}	else {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_CLOSED, "Payment is already closed");
+			}
+		}	else {
+			if (payment == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+			}
+		}
+		
 		return null;
     }
 	

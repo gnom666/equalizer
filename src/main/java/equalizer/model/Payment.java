@@ -13,8 +13,10 @@ import javax.persistence.ManyToOne;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import equalizer.controlermodel.Constants.PaymentStatus;
+
 @Entity
-public class Payments { 
+public class Payment { 
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,7 +39,7 @@ public class Payments {
 	
 	private String modified;
 	private double ammount;
-	private int status;
+	private PaymentStatus status;
 		
 	public Activity getActivity() {
 		return activity;
@@ -59,7 +61,7 @@ public class Payments {
 		return modified;
 	}
 
-	public int getStatus() {
+	public PaymentStatus getStatus() {
 		return status;
 	}
 
@@ -87,8 +89,8 @@ public class Payments {
 		updateModified();
 	}
 
-	public void setStatus(int status) {
-		this.status = status;
+	public void setStatus(PaymentStatus pending) {
+		this.status = pending;
 	}
 
 	public void setTo(Person to) {

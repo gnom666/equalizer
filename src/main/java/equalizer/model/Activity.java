@@ -42,9 +42,9 @@ public class Activity {
 	@OneToMany(mappedBy = "activity")
 	private List<Task> tasks;
 	
-	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payment.class)
 	@OneToMany(mappedBy = "activity")
-	private List<Payments> payments;
+	private List<Payment> payments;
 	
 	private String name;
 	private String modified;
@@ -77,7 +77,7 @@ public class Activity {
 		return participants;
 	}
 
-	public List<Payments> getPayments() {
+	public List<Payment> getPayments() {
 		return payments;
 	}
 
@@ -122,7 +122,7 @@ public class Activity {
 		updateModified();
 	}
 
-	public void setPayments(List<Payments> payments) {
+	public void setPayments(List<Payment> payments) {
 		this.payments = payments;
 		updateModified();
 	}

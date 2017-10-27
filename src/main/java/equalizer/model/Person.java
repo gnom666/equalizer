@@ -34,13 +34,13 @@ public class Person {
 	@OneToMany(mappedBy = "owner")
 	private Set<Task> tasks;
 	
-	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payment.class)
 	@OneToMany(mappedBy = "from")
-	private Set<Payments> paid;
+	private Set<Payment> paid;
 	
-	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payment.class)
 	@OneToMany(mappedBy = "to")
-	private Set<Payments> received;
+	private Set<Payment> received;
 
 	private String firstName;
 	private String lastName;
@@ -63,20 +63,20 @@ public class Person {
 		updateModified();
 	}
 
-	public Set<Payments> getPaid() {
+	public Set<Payment> getPaid() {
 		return paid;
 	}
 
-	public void setPaid(Set<Payments> paid) {
+	public void setPaid(Set<Payment> paid) {
 		this.paid = paid;
 		updateModified();
 	}
 
-	public Set<Payments> getReceived() {
+	public Set<Payment> getReceived() {
 		return received;
 	}
 
-	public void setReceived(Set<Payments> received) {
+	public void setReceived(Set<Payment> received) {
 		this.received = received;
 		updateModified();
 	}

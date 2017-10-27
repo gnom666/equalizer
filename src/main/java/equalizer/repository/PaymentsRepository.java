@@ -11,26 +11,28 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import equalizer.model.Activity;
-import equalizer.model.Payments;
+import equalizer.model.Payment;
 import equalizer.model.Person;
 
 @RepositoryRestResource(collectionResourceRel = "payments", path = "payments")
-public interface PaymentsRepository extends PagingAndSortingRepository<Payments, Long> {
+public interface PaymentsRepository extends PagingAndSortingRepository<Payment, Long> {
 
-	List<Payments> findByActivity(@Param("activity") Activity activity);
+	List<Payment> findByActivity(@Param("activity") Activity activity);
 	
-	List<Payments> findByFrom(@Param("from") Person from);
+	List<Payment> findByFrom(@Param("from") Person from);
 	
-	List<Payments> findByTo(@Param("to") Person to);
+	List<Payment> findByTo(@Param("to") Person to);
+	
+	Payment findById(@Param("id") Long id);
 	
 	@Transactional
-	List<Payments> removeByActivity(@Param("activity") Activity activity);
+	List<Payment> removeByActivity(@Param("activity") Activity activity);
 	
 	@Transactional
 	long deleteByActivity(@Param("activity") Activity activity);
 		
 	@Query("SELECT p FROM Payments p WHERE p.activity.id = :activityId")
-	List<Payments> findByActivityId (@Param("activityId") Long activityId);
+	List<Payment> findByActivityId (@Param("activityId") Long activityId);
 	
 	@Transactional
 	@Modifying

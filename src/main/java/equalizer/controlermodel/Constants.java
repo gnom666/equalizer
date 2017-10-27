@@ -39,7 +39,9 @@ public final class Constants {
 		PERSON_NOT_FOUND,
 		TASK_NOT_FOUND,
 		ACTIVITYOWNER_MISSMATCH,
-		PAYMENTSLISTS_MISSMATCH
+		PAYMENTSLISTS_MISSMATCH,
+		PAYMENT_USERMISSMATCH,
+		PAYMENT_CLOSED
 	}
 	
 	public static String errorTypeName (ErrorType type) {
@@ -63,6 +65,12 @@ public final class Constants {
 			break;
 		case PAYMENTSLISTS_MISSMATCH:
 			typeName = "PAYMENTSLISTS_MISSMATCH";
+			break;
+		case PAYMENT_USERMISSMATCH:
+			typeName = "PAYMENT_USERMISSMATCH";
+			break;
+		case PAYMENT_CLOSED:
+			typeName = "PAYMENT_CLOSED";
 			break;
 		default:
 			typeName = "UNKNOWN";
@@ -97,5 +105,14 @@ public final class Constants {
 			statusName = "UNKNOWN";
 		}
 		return statusName;
+	}
+	
+	public static PaymentStatus intToStatus (int status) {
+		switch (status) {
+			case 1: return PaymentStatus.REQUESTED;
+			case 2: return PaymentStatus.PAID;
+			case 3: return PaymentStatus.CONFLICT;
+			default: return PaymentStatus.PENDING;
+		}
 	}
 }
