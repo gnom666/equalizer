@@ -1,9 +1,9 @@
-package equalizer;
+package equalizer.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -36,15 +36,15 @@ public class Activity {
 	@JoinTable(	name = "person_activity", 
 				joinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"), 
 				inverseJoinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"))
-	private Set<Person> participants;
+	private List<Person> participants;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Task.class)
 	@OneToMany(mappedBy = "activity")
-	private Set<Task> tasks;
+	private List<Task> tasks;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payments.class)
 	@OneToMany(mappedBy = "activity")
-	private Set<Payments> payments;
+	private List<Payments> payments;
 	
 	private String name;
 	private String modified;
@@ -53,63 +53,42 @@ public class Activity {
 	private boolean calculated = false;
 	private double total = 0.0;
 		
-	public long getId() {
-		return id;
-	}
-
-	public Set<Payments> getPayments() {
-		return payments;
-	}
-
-	public void setPayments(Set<Payments> payments) {
-		this.payments = payments;
-		updateModified();
-	}
-
 	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
-		updateModified();
-	}
-	
-	public Set<Task> getTasks() {
-		return tasks;
-	}
-
-	public void setTasks(Set<Task> tasks) {
-		this.tasks = tasks;
-		updateModified();
+	public long getId() {
+		return id;
 	}
 
 	public String getModified() {
 		return modified;
 	}
 
-	public void setModified(String modified) {
-		this.modified = modified;
-	}
-	
-	public Person getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Person owner) {
-		this.owner = owner;
-		updateModified();
-	}
-
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-		updateModified();
+	public Person getOwner() {
+		return owner;
+	}
+	
+	public List<Person> getParticipants() {
+		return participants;
 	}
 
+	public List<Payments> getPayments() {
+		return payments;
+	}
+
+	public List<Task> getTasks() {
+		return tasks;
+	}
+
+	public double getTotal() {
+		return total;
+	}
+	
 	public boolean isCalculated() {
 		return calculated;
 	}
@@ -119,21 +98,42 @@ public class Activity {
 		updateModified();
 	}
 
-	public double getTotal() {
-		return total;
+	public void setDate(Date date) {
+		this.date = date;
+		updateModified();
+	}
+
+	public void setModified(String modified) {
+		this.modified = modified;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+		updateModified();
+	}
+
+	public void setOwner(Person owner) {
+		this.owner = owner;
+		updateModified();
+	}
+
+	public void setParticipants(List<Person> participants) {
+		this.participants = participants;
+		updateModified();
+	}
+
+	public void setPayments(List<Payments> payments) {
+		this.payments = payments;
+		updateModified();
+	}
+	
+	public void setTasks(List<Task> tasks) {
+		this.tasks = tasks;
+		updateModified();
 	}
 
 	public void setTotal(double total) {
 		this.total = total;
-		updateModified();
-	}
-	
-	public Set<Person> getParticipants() {
-		return participants;
-	}
-
-	public void setParticipants(Set<Person> participants) {
-		this.participants = participants;
 		updateModified();
 	}
 

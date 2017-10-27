@@ -1,4 +1,4 @@
-package equalizer;
+package equalizer.repository;
 
 import java.util.List;
 
@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+
+import equalizer.model.Task;
 
 @RepositoryRestResource(collectionResourceRel = "tasks", path = "tasks")
 public interface TaskRepository extends PagingAndSortingRepository<Task, Long> {

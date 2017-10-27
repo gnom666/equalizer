@@ -1,11 +1,11 @@
-package tmp_model;
+package equalizer.controlermodel;
 
 public class Node implements Comparable<Node> {
-	public Long idPerson;
+	public Long personId;
 	public double ammount = 0.0;
 	
 	public Node (Long idp, double amm) {
-		idPerson = idp;
+		personId = idp;
 		ammount = amm;
 	}
 

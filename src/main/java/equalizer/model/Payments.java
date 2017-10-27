@@ -1,4 +1,4 @@
-package equalizer;
+package equalizer.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,31 +37,44 @@ public class Payments {
 	
 	private String modified;
 	private double ammount;
+	private int status;
 		
-	public long getId() {
-		return id;
-	}
-	
-	public String getModified() {
-		return modified;
-	}
-
-	public void setModified(String modified) {
-		this.modified = modified;
-		updateModified();
+	public Activity getActivity() {
+		return activity;
 	}
 
 	public double getAmmount() {
 		return ammount;
 	}
 
+	public Person getFrom() {
+		return from;
+	}
+	
+	public long getId() {
+		return id;
+	}
+
+	public String getModified() {
+		return modified;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public Person getTo() {
+		return to;
+	}
+	
+	public void setActivity(Activity activity) {
+		this.activity = activity;
+		updateModified();
+	}
+
 	public void setAmmount(double ammount) {
 		this.ammount = ammount;
 		updateModified();
-	}
-	
-	public Person getFrom() {
-		return from;
 	}
 
 	public void setFrom(Person from) {
@@ -69,28 +82,18 @@ public class Payments {
 		updateModified();
 	}
 
-	public Person getTo() {
-		return to;
+	public void setModified(String modified) {
+		this.modified = modified;
+		updateModified();
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 
 	public void setTo(Person to) {
 		this.to = to;
 		updateModified();
-	}
-
-	public Activity getActivity() {
-		return activity;
-	}
-
-	public void setActivity(Activity activity) {
-		this.activity = activity;
-		updateModified();
-	}
-	
-	public String toStr () {
-		return "" + from.getFirstName() + "(" + from.getId() + ") -> "
-				  + to.getFirstName() + "(" + to.getId() + ") : " 
-				  + ammount; 
 	}
 
 	private void updateModified() {
