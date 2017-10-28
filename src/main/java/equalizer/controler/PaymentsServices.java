@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 
-import javax.persistence.EntityManager;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +15,6 @@ import equalizer.EqualizerConfiguration;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Node;
 import equalizer.controlermodel.Row;
-import equalizer.controlermodel.Constants;
 import equalizer.controlermodel.Constants.*;
 import equalizer.model.Activity;
 import equalizer.model.Payment;
@@ -25,10 +22,12 @@ import equalizer.model.Person;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
+import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.PaymentOut;
 
 
 @RestController
+@RequestMapping("/payments")
 public class PaymentsServices {
 	
 	@Autowired
@@ -39,6 +38,9 @@ public class PaymentsServices {
 	
 	@Autowired
 	private PaymentsRepository paymentsRepo;
+	
+	@Autowired
+	private TaskRepository taskRepo;
 	
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -154,7 +156,7 @@ public class PaymentsServices {
 	}
 	
 	@RequestMapping(value="/generatepayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
-    public List<PaymentOut> generatePayments(@RequestParam(value="aId", defaultValue="") String activityId, @RequestParam(value="idp", defaultValue="") String personId, @RequestParam(value="redo", defaultValue="false") boolean reDo) {
+    public List<PaymentOut> generatePayments(@RequestParam(value="aId", defaultValue="0") String activityId, @RequestParam(value="pId", defaultValue="") String personId, @RequestParam(value="redo", defaultValue="false") boolean reDo) {
     	
 		Activity act = activityRepo.findById(Long.decode(activityId));
 		Person per = personRepo.findById(Long.decode(personId));
@@ -165,6 +167,11 @@ public class PaymentsServices {
 						
 			act.setCalculated(true);
 			activityRepo.save(act);
+			
+			act.getTasks().forEach(t->{
+				t.setCalculated(true);
+				taskRepo.save(t);
+			});
 			
 			return paymentsOutList;
 		}
@@ -184,7 +191,7 @@ public class PaymentsServices {
     }
 	
 	@RequestMapping(value="/testpayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
-    public List<PaymentOut> testPayments(@RequestParam(value="aId", defaultValue="") String activityId) {
+    public List<PaymentOut> testPayments(@RequestParam(value="aId", defaultValue="0") String activityId) {
     	
 		Activity act = activityRepo.findById(Long.decode(activityId));
 		if (act != null) {
@@ -198,7 +205,7 @@ public class PaymentsServices {
     }
 	
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.GET)
-    public List<PaymentOut> testPaymentsByActivity(@RequestParam(value="aId", defaultValue="") String activityId) {
+    public List<PaymentOut> testPaymentsByActivity(@RequestParam(value="aId", defaultValue="0") String activityId) {
     	
 		List<Payment> paymentsList = paymentsRepo.findByActivityId(Long.decode(activityId));
 		ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
@@ -208,26 +215,18 @@ public class PaymentsServices {
 		return paymentsOutList;
     }
 	
-	@RequestMapping(value="/deletepaymentsbyactid", method=RequestMethod.GET)
-    public String deletePaymentsByActivityId(@RequestParam(value="aId", defaultValue="") String activityId) {
-    	
-		try {
-			paymentsRepo.removeByActivityId(Long.decode(activityId));
-		}	catch (Exception e) {
-			return e.getMessage();
-		}	
-		
-		return "OK";
-    }
-	
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.DELETE)
-    public List<PaymentOut> deletePaymentsByActivity(@RequestParam(value="aId", defaultValue="") String activityId) {
+    public List<PaymentOut> deletePaymentsByActivity(@RequestParam(value="aId", defaultValue="0") String activityId) {
     	
 		Activity activity = activityRepo.findById(Long.decode(activityId));
 		if (activity != null) {
 			List<Payment> paymentsList =  paymentsRepo.removeByActivity(activity);
-			activity.setCalculated(true);
+			activity.setCalculated(false);
 			activityRepo.save(activity);
+			activity.getTasks().forEach(t->{
+				t.setCalculated(false);
+				taskRepo.save(t);
+			});
 			ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
 			paymentsList.forEach(p->paymentsOutList.add(new PaymentOut(p)));		
 			
@@ -238,7 +237,7 @@ public class PaymentsServices {
     }
 	
 	@RequestMapping(value="/paymentsbyfrom", method=RequestMethod.GET)
-    public List<PaymentOut> paymentsByFrom(@RequestParam(value="fId", defaultValue="") String fromId) {
+    public List<PaymentOut> paymentsByFrom(@RequestParam(value="fId", defaultValue="0") String fromId) {
     	
 		Person person = personRepo.findById(Long.decode(fromId));
 		if (person != null) {
@@ -258,7 +257,7 @@ public class PaymentsServices {
     }
 	
 	@RequestMapping(value="/paymentsbyto", method=RequestMethod.GET)
-    public List<PaymentOut> paymentsByTo(@RequestParam(value="tId", defaultValue="") String toId) {
+    public List<PaymentOut> paymentsByTo(@RequestParam(value="tId", defaultValue="0") String toId) {
     	
 		Person person = personRepo.findById(Long.decode(toId));
 		if (person != null) {
@@ -278,7 +277,7 @@ public class PaymentsServices {
     }
 	
 	@RequestMapping(value="/makepay", method=RequestMethod.GET)
-    public PaymentOut makePayment(@RequestParam(value="fId", defaultValue="") String fromId, 
+    public PaymentOut makePayment(@RequestParam(value="fId", defaultValue="0") String fromId, 
     		@RequestParam(value="pId", defaultValue="") String paymentId) {
     	
 		Person person = personRepo.findById(Long.decode(fromId));
@@ -287,7 +286,6 @@ public class PaymentsServices {
 			if (payment.getFrom().getId() == person.getId()) {
 				payment.setStatus(PaymentStatus.REQUESTED);
 				paymentsRepo.save(payment);
-				return new PaymentOut(payment);
 			}	else {
 				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
 			}
@@ -300,11 +298,11 @@ public class PaymentsServices {
 			}
 		}
 		
-		return null;
+		return new PaymentOut(payment);
     }
 	
 	@RequestMapping(value="/acceptpay", method=RequestMethod.GET)
-    public PaymentOut acceptPayment(@RequestParam(value="tId", defaultValue="") String toId, 
+    public PaymentOut acceptPayment(@RequestParam(value="tId", defaultValue="0") String toId, 
     		@RequestParam(value="pId", defaultValue="") String paymentId) {
     	
 		Person person = personRepo.findById(Long.decode(toId));
@@ -313,9 +311,8 @@ public class PaymentsServices {
 			if (payment.getTo().getId() == person.getId()) {
 				payment.setStatus(PaymentStatus.PAID);
 				paymentsRepo.save(payment);
-				return new PaymentOut(payment);
 			}	else {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment to is different to person Id");
 			}
 		}	else {
 			if (payment == null) {
@@ -326,12 +323,12 @@ public class PaymentsServices {
 			}
 		}
 		
-		return null;
+		return new PaymentOut(payment);
     }
 	
 	@RequestMapping(value="/suepay", method=RequestMethod.GET)
-    public PaymentOut suePayment(@RequestParam(value="tId", defaultValue="") String toId, 
-    		@RequestParam(value="pId", defaultValue="") String paymentId) {
+    public PaymentOut suePayment(@RequestParam(value="tId", defaultValue="0") String toId, 
+    							 @RequestParam(value="pId", defaultValue="") String paymentId) {
     	
 		Person person = personRepo.findById(Long.decode(toId));
 		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
@@ -339,7 +336,6 @@ public class PaymentsServices {
 			if (payment.getTo().getId() == person.getId()) {
 				payment.setStatus(PaymentStatus.CONFLICT);
 				paymentsRepo.save(payment);
-				return new PaymentOut(payment);
 			}	else {
 				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
 			}
@@ -352,18 +348,17 @@ public class PaymentsServices {
 			}
 		}
 		
-		return null;
+		return new PaymentOut(payment);
     }
 	
 	@RequestMapping(value="/resetpay", method=RequestMethod.GET)
-    public PaymentOut resetePayment(@RequestParam(value="pId", defaultValue="") String paymentId) {
+    public PaymentOut resetPayment(@RequestParam(value="pId", defaultValue="0") String paymentId) {
     	
 		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
 		if (payment != null) {
 			if (payment.getStatus() != PaymentStatus.PAID) {
 				payment.setStatus(PaymentStatus.PENDING);
 				paymentsRepo.save(payment);
-				return new PaymentOut(payment);
 			}	else {
 				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_CLOSED, "Payment is already closed");
 			}
@@ -373,7 +368,23 @@ public class PaymentsServices {
 			}
 		}
 		
-		return null;
+		return new PaymentOut(payment);
+    }
+	
+	@RequestMapping(value="/forceresetpay", method=RequestMethod.GET)
+    public PaymentOut forceResetPayment(@RequestParam(value="pId", defaultValue="0") String paymentId) {
+    	
+		Payment payment = paymentsRepo.findById(Long.decode(paymentId));
+		if (payment != null) {
+			payment.setStatus(PaymentStatus.PENDING);
+			paymentsRepo.save(payment);
+		}	else {
+			if (payment == null) {
+				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+			}
+		}
+		
+		return new PaymentOut(payment);
     }
 	
 	@RequestMapping(value="/lasterror", method=RequestMethod.GET)

@@ -29,6 +29,7 @@ import equalizer.viewmodel.PaymentOut;
 
 
 @RestController
+@RequestMapping("/activities")
 public class ActivitiesServices {
 	
 	@Autowired
@@ -38,13 +39,10 @@ public class ActivitiesServices {
 	private PersonRepository personRepo;
 	
 	@Autowired
-	private PaymentsRepository paymentsRepo;
-	
-	@Autowired
 	private EqualizerConfiguration eConf;
 	
 	@RequestMapping(value="/activitiesbyowner", method=RequestMethod.GET)
-    public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="") String ownerId) {
+    public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="0") String ownerId) {
     	
 		Person owner = personRepo.findById(Long.decode(ownerId));
 		if (owner != null) {
@@ -64,7 +62,7 @@ public class ActivitiesServices {
     }
 	
 	@RequestMapping(value="/activitiesbyparticipant", method=RequestMethod.GET)
-    public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="") String personId) {
+    public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="0") String personId) {
     	
 		Person person = personRepo.findById(Long.decode(personId));
 		if (person != null) {

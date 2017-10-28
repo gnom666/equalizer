@@ -38,17 +38,19 @@ public class ActivityOut {
 		this.tasks = new ArrayList<>();
 		this.payments = new ArrayList<>();
 		
-		this.id = activity.getId();
-		this.owner = activity.getOwner().getId();
-		this.name = activity.getName();
-		this.modified = activity.getModified();
-		this.date = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(activity.getDate());
-		this.calculated = activity.isCalculated();
-		this.total = activity.getTotal();
-		
-		activity.getParticipants().forEach(p->this.participants.add(p.getId()));
-		activity.getTasks().forEach(t->this.tasks.add(t.getId()));
-		activity.getPayments().forEach(p->this.payments.add(p.getId()));
+		if (activity != null) {
+			this.id = activity.getId();
+			this.owner = activity.getOwner().getId();
+			this.name = activity.getName();
+			this.modified = activity.getModified();
+			this.date = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(activity.getDate());
+			this.calculated = activity.isCalculated();
+			this.total = activity.getTotal();
+			
+			activity.getParticipants().forEach(p->this.participants.add(p.getId()));
+			activity.getTasks().forEach(t->this.tasks.add(t.getId()));
+			activity.getPayments().forEach(p->this.payments.add(p.getId()));
+		}
 	}
 	
 	@Override

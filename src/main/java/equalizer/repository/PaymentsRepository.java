@@ -31,12 +31,12 @@ public interface PaymentsRepository extends PagingAndSortingRepository<Payment, 
 	@Transactional
 	long deleteByActivity(@Param("activity") Activity activity);
 		
-	@Query("SELECT p FROM Payments p WHERE p.activity.id = :activityId")
+	@Query("SELECT p FROM Payment p WHERE p.activity.id = :activityId")
 	List<Payment> findByActivityId (@Param("activityId") Long activityId);
 	
 	@Transactional
 	@Modifying
-	@Query("DELETE FROM Payments p WHERE p.activity.id = :activityId")
+	@Query("DELETE FROM Payment p WHERE p.activity.id = :activityId")
 	void removeByActivityId (@Param("activityId") Long activityId);
 	
 }
