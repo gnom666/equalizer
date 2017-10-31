@@ -39,6 +39,10 @@ public class ActivityOut {
 		this.payments = new ArrayList<>();
 		
 		if (activity != null) {
+			activity.getParticipants().forEach(p->this.participants.add(p.getId()));
+			activity.getTasks().forEach(t->this.tasks.add(t.getId()));
+			activity.getPayments().forEach(p->this.payments.add(p.getId()));
+			
 			this.id = activity.getId();
 			this.owner = activity.getOwner().getId();
 			this.name = activity.getName();
@@ -46,16 +50,12 @@ public class ActivityOut {
 			this.date = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(activity.getDate());
 			this.calculated = activity.isCalculated();
 			this.total = activity.getTotal();
-			
-			activity.getParticipants().forEach(p->this.participants.add(p.getId()));
-			activity.getTasks().forEach(t->this.tasks.add(t.getId()));
-			activity.getPayments().forEach(p->this.payments.add(p.getId()));
 		}
 	}
 	
 	@Override
 	public String toString() {
-		return "ActivityOut [id=" + id + ", owner=" + owner + ", participants=" + participants + ", tasks=" + tasks
+		return "[id=" + id + ", owner=" + owner + ", participants=" + participants + ", tasks=" + tasks
 				+ ", payments=" + payments + ", name=" + name + ", modified=" + modified + ", date=" + date
 				+ ", calculated=" + calculated + ", total=" + total + "]";
 	}

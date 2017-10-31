@@ -24,18 +24,20 @@ public class TaskOut {
 	}
 	
 	public TaskOut(Task task) {
-		this.id = task.getId();
-		this.owner = task.getOwner().getId();
-		this.activity = task.getActivity().getId();
-		this.name = task.getName();
-		this.modified = task.getModified();
-		this.calculated = task.isCalculated();
-		this.ammount = task.getAmmount();
+		if (task != null) {
+			this.id = task.getId();
+			this.owner = task.getOwner().getId();
+			this.activity = task.getActivity().getId();
+			this.name = task.getName();
+			this.modified = task.getModified();
+			this.calculated = task.isCalculated();
+			this.ammount = task.getAmmount();
+		}
 	}
 
 	@Override
 	public String toString() {
-		return "TaskOut [id=" + id + ", owner=" + owner + ", activity=" + activity + ", name=" + name + ", modified="
+		return "[id=" + id + ", owner=" + owner + ", activity=" + activity + ", name=" + name + ", modified="
 				+ modified + ", calculated=" + calculated + ", ammount=" + ammount + "]";
 	}
 
