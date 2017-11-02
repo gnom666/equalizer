@@ -37,9 +37,9 @@ public class TasksServices {
 	private EqualizerConfiguration eConf;
 	
 	@RequestMapping(value="/tasksbyact", method=RequestMethod.GET)
-    public List<TaskOut> tasksByActivity(@RequestParam(value="aId", defaultValue="0") String activityId) {
+    public List<TaskOut> tasksByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
-		Activity activity = activityRepo.findById(Long.decode(activityId));
+		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
 			List<Task> tasksList =  taskRepo.findByActivity(activity);
 			ArrayList<TaskOut> tasksOutList = new ArrayList<>();
@@ -52,9 +52,9 @@ public class TasksServices {
     }
 	
 	@RequestMapping(value="/tasksbyowner", method=RequestMethod.GET)
-    public List<TaskOut> tasksByOwner(@RequestParam(value="oId", defaultValue="0") String ownerId) {
+    public List<TaskOut> tasksByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
-		Person owner = personRepo.findById(Long.decode(ownerId));
+		Person owner = personRepo.findById(ownerId);
 		if (owner != null) {
 			List<Task> tasksList =  taskRepo.findByOwner(owner);
 			ArrayList<TaskOut> tasksOutList = new ArrayList<>();
@@ -67,11 +67,11 @@ public class TasksServices {
     }
 	
 	@RequestMapping(value="/tasksbyactandowner", method=RequestMethod.GET)
-    public List<TaskOut> tasksByActivityAndOwner(@RequestParam(value="aId", defaultValue="0") String activityId, 
-    											 @RequestParam(value="oId", defaultValue="0") String ownerId) {
+    public List<TaskOut> tasksByActivityAndOwner(@RequestParam(value="aId", defaultValue="0") long activityId, 
+    											 @RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
-		Activity activity = activityRepo.findById(Long.decode(activityId));
-		Person owner = personRepo.findById(Long.decode(ownerId));
+		Activity activity = activityRepo.findById(activityId);
+		Person owner = personRepo.findById(ownerId);
 		if (activity != null && owner != null) {
 			List<Task> tasksList =  taskRepo.findByActivityAndOwner(activity, owner);
 			ArrayList<TaskOut> tasksOutList = new ArrayList<>();

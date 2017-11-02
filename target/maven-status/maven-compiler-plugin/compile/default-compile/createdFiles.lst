@@ -1,13 +1,2 @@
-tmp_model/Node.class
-equalizer/PaymentsServices.class
-equalizer/TaskRepository.class
-tmp_model/Pay.class
-equalizer/Task.class
-equalizer/Person.class
-equalizer/Activity.class
-equalizer/ActivityRepository.class
+equalizer/controlermodel/Constants$1.class
 equalizer/Application.class
-tmp_model/Row.class
-equalizer/Payments.class
-equalizer/PersonRepository.class
-equalizer/PaymentsRepository.class

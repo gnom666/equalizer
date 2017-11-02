@@ -23,5 +23,5 @@ public interface ActivityRepository extends PagingAndSortingRepository<Activity,
 	List<Activity> findByParticipantsIn(@Param("person") Person person);
 	
 	@Query("SELECT a FROM Activity a WHERE a.owner.id = :ownerId")
-	List<Activity> findByOwnerId(@Param("ownerId") long ownerId);
+	List<Activity> findByOwnerEmail(@Param("ownerId") String ownerId);
 }

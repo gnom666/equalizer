@@ -8,7 +8,7 @@ import equalizer.model.Activity;
 
 public class ActivityOut {
 	public long id;
-	public long owner;
+	public String owner;
 	public List<Long> participants;
 	public List<Long> tasks;
 	public List<Long> payments;
@@ -18,7 +18,7 @@ public class ActivityOut {
 	public boolean calculated;
 	public double total = 0.0;
 	
-	public ActivityOut(long id, long owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
+	public ActivityOut(long id, String owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
 			String modified, String date, boolean calculated, double total) {
 		this.id = id;
 		this.owner = owner;
@@ -44,7 +44,7 @@ public class ActivityOut {
 			activity.getPayments().forEach(p->this.payments.add(p.getId()));
 			
 			this.id = activity.getId();
-			this.owner = activity.getOwner().getId();
+			this.owner = activity.getOwner().getEmail();
 			this.name = activity.getName();
 			this.modified = activity.getModified();
 			this.date = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(activity.getDate());
@@ -52,12 +52,5 @@ public class ActivityOut {
 			this.total = activity.getTotal();
 		}
 	}
-	
-	@Override
-	public String toString() {
-		return "[id=" + id + ", owner=" + owner + ", participants=" + participants + ", tasks=" + tasks
-				+ ", payments=" + payments + ", name=" + name + ", modified=" + modified + ", date=" + date
-				+ ", calculated=" + calculated + ", total=" + total + "]";
-	}
-	
+		
 }

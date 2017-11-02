@@ -11,7 +11,9 @@ import equalizer.model.Person;
 @RepositoryRestResource(collectionResourceRel = "people", path = "people")
 public interface PersonRepository extends PagingAndSortingRepository<Person, Long> {
 
-	Person findById(@Param("id") Long id);
+	Person findByEmail(@Param("email") String email);
+	
+	Person findById(@Param("id") long id);
 	
 	List<Person> findByLastName(@Param("name") String name);
 	

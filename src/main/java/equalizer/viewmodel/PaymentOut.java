@@ -34,10 +34,5 @@ public class PaymentOut {
 			this.status = payments.getStatus();
 		}
 	}
-
-	@Override
-	public String toString() {
-		return "[id=" + id + ", from=" + from + ", to=" + to + ", activity=" + activity + ", modified="
-				+ modified + ", ammount=" + ammount + ", status=" + status + "]";
-	}
+	
 }

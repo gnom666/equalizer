@@ -35,10 +35,4 @@ public class TaskOut {
 		}
 	}
 
-	@Override
-	public String toString() {
-		return "[id=" + id + ", owner=" + owner + ", activity=" + activity + ", name=" + name + ", modified="
-				+ modified + ", calculated=" + calculated + ", ammount=" + ammount + "]";
-	}
-
 }

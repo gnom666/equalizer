@@ -14,9 +14,4 @@ public class EqualizerConfiguration {
 		return new Error(ErrorCode.UNKNOWN, ErrorType.UNKNOWN, "");
 	}
 	
-	@Bean
-	public EntityManagerBean entityManagerBean() {
-	    return new EntityManagerBean();
-	}
-	
 }

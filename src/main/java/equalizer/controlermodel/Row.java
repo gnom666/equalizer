@@ -1,7 +1,7 @@
 package equalizer.controlermodel;
 
 public class Row {
-	public Long personId;
+	public long personId;
 	public int numPersons = 0;
 	public double totalPaid = 0.0;
 	public double paidPerPerson = 0.0;

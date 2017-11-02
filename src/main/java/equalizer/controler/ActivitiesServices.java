@@ -42,9 +42,9 @@ public class ActivitiesServices {
 	private EqualizerConfiguration eConf;
 	
 	@RequestMapping(value="/activitiesbyowner", method=RequestMethod.GET)
-    public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="0") String ownerId) {
+    public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
-		Person owner = personRepo.findById(Long.decode(ownerId));
+		Person owner = personRepo.findById(ownerId);
 		if (owner != null) {
 			List<Activity> activitiesList = activityRepo.findByOwner(owner);
 			if (activitiesList != null) {
@@ -62,9 +62,9 @@ public class ActivitiesServices {
     }
 	
 	@RequestMapping(value="/activitiesbyparticipant", method=RequestMethod.GET)
-    public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="0") String personId) {
+    public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="0") long personId) {
     	
-		Person person = personRepo.findById(Long.decode(personId));
+		Person person = personRepo.findById(personId);
 		if (person != null) {
 			List<Activity> activitiesList = activityRepo.findByParticipantsIn(person);
 			if (activitiesList != null) {

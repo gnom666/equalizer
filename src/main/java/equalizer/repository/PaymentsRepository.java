@@ -23,7 +23,7 @@ public interface PaymentsRepository extends PagingAndSortingRepository<Payment, 
 	
 	List<Payment> findByTo(@Param("to") Person to);
 	
-	Payment findById(@Param("id") Long id);
+	Payment findById(@Param("id") long id);
 	
 	@Transactional
 	List<Payment> removeByActivity(@Param("activity") Activity activity);

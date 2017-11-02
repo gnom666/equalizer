@@ -41,7 +41,8 @@ public final class Constants {
 		ACTIVITYOWNER_MISSMATCH,
 		PAYMENTSLISTS_MISSMATCH,
 		PAYMENT_USERMISSMATCH,
-		PAYMENT_CLOSED
+		PAYMENT_CLOSED,
+		ZERO_PERSONS
 	}
 	
 	public static String errorTypeName (ErrorType type) {
@@ -71,6 +72,9 @@ public final class Constants {
 			break;
 		case PAYMENT_CLOSED:
 			typeName = "PAYMENT_CLOSED";
+			break;
+		case ZERO_PERSONS:
+			typeName = "ZERO_PERSONS";
 			break;
 		default:
 			typeName = "UNKNOWN";
