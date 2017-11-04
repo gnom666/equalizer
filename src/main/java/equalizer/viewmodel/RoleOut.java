@@ -24,7 +24,7 @@ public class RoleOut {
 		
 		if (role != null) {
 			this.id = role.getId();
-			this.roleType = role.getRole();
+			this.roleType = role.getRoleType();
 			role.getMembers().forEach(p -> this.members.add(p.getId()));
 		}
 	}

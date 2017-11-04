@@ -127,7 +127,7 @@ public final class Constants {
 		GUEST
 	}
 	
-	public static String RoleTypeName (RoleType role) {
+	public static String roleTypeName (RoleType role) {
 		
 		String roleTypeName = "";
 		switch (role) {

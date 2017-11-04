@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import equalizer.EqualizerConfiguration;
+import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Node;
 import equalizer.controlermodel.Row;

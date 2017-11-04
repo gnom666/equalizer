@@ -15,7 +15,7 @@ import equalizer.model.Role;
 @RepositoryRestResource(collectionResourceRel = "roles", path = "roles")
 public interface RoleRepository extends PagingAndSortingRepository<Role, Long> {
 
-	List<Role> findByRole(@Param("role") RoleType role);
+	List<Role> findByRoleType(@Param("roleType") RoleType roleType);
 	
 	Role findById(@Param("id") long id);
 	

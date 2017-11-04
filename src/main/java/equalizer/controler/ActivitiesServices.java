@@ -1,11 +1,7 @@
 package equalizer.controler;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
-
-import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,19 +9,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import equalizer.EqualizerConfiguration;
-import equalizer.controlermodel.Error;
-import equalizer.controlermodel.Node;
-import equalizer.controlermodel.Row;
+import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
 import equalizer.model.Activity;
 import equalizer.model.Person;
 import equalizer.repository.ActivityRepository;
-import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.viewmodel.ActivityOut;
-import equalizer.viewmodel.PaymentOut;
 
 
 @RestController

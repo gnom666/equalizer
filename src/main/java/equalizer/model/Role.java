@@ -7,7 +7,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -24,18 +23,18 @@ public class Role {
 	private long id;
 	
 	@Column(nullable = false, updatable = false, unique = true)
-	private RoleType role;
+	private RoleType roleType;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
 	@OneToMany(mappedBy = "role")
 	private Set<Person> members;
 
-	public RoleType getRole() {
-		return role;
+	public RoleType getRoleType() {
+		return roleType;
 	}
 
-	public void setRole(RoleType role) {
-		this.role = role;
+	public void setRoleType(RoleType roleType) {
+		this.roleType = roleType;
 	}
 
 	public long getId() {
