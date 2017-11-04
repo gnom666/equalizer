@@ -119,4 +119,42 @@ public final class Constants {
 			default: return PaymentStatus.PENDING;
 		}
 	}
+	
+	public static enum RoleType {
+		ADMINISTRATOR,
+		COMMON_USER,
+		ADVANCED_USER,
+		GUEST
+	}
+	
+	public static String RoleTypeName (RoleType role) {
+		
+		String roleTypeName = "";
+		switch (role) {
+		case ADMINISTRATOR:
+			roleTypeName = "ADMINISTRATOR";
+			break;
+		case COMMON_USER:
+			roleTypeName = "COMMON_USER";
+			break;
+		case ADVANCED_USER:
+			roleTypeName = "ADVANCED_USER";
+			break;
+		case GUEST:
+			roleTypeName = "GUEST";
+			break;
+		default:
+			roleTypeName = "UNKNOWN";
+		}
+		return roleTypeName;
+	}
+	
+	public static RoleType intToRoleType (int role) {
+		switch (role) {
+			case 1: return RoleType.ADMINISTRATOR;
+			case 2: return RoleType.COMMON_USER;
+			case 3: return RoleType.ADVANCED_USER;
+			default: return RoleType.GUEST;
+		}
+	}
 }

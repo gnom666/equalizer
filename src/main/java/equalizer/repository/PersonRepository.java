@@ -1,6 +1,7 @@
 package equalizer.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +12,7 @@ import equalizer.model.Person;
 @RepositoryRestResource(collectionResourceRel = "people", path = "people")
 public interface PersonRepository extends PagingAndSortingRepository<Person, Long> {
 
-	Person findByEmail(@Param("email") String email);
+	Optional<Person> findByEmail(@Param("email") String email);
 	
 	Person findById(@Param("id") long id);
 	

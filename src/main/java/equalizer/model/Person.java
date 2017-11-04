@@ -2,15 +2,21 @@ package equalizer.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
@@ -47,18 +53,27 @@ public class Person {
 	private Set<Payment> received;
 	
 	private String firstName;
-
 	private String lastName;
 	private String modified;
+	
 	@NotNull
     @Min(1)
 	private int numpers;
+	
 	@Column(unique = true, nullable = false, length = 45)
 	private String email;
+	
 	@Column(nullable = false)
 	private String password;
+	
 	@Column(nullable = false)
 	private boolean enabled;
+	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Role.class)
+	@ManyToOne
+    @JoinColumn(name="role")
+    private Role role;
+	
 	public Set<Activity> getActivities() {
 		return activities;
 	}
@@ -66,18 +81,18 @@ public class Person {
 	public String getEmail() {
 		return email;
 	}
+
 	public String getFirstName() {
 		return firstName;
 	}
-	
+
 	public long getId() {
 		return id;
 	}
-
 	public String getLastName() {
 		return lastName;
 	}
-
+	
 	public String getModified() {
 		return modified;
 	}
@@ -101,7 +116,11 @@ public class Person {
 	public Set<Payment> getReceived() {
 		return received;
 	}
-	
+
+	public Role getRole() {
+		return role;
+	}
+
 	public Set<Task> getTasks() {
 		return tasks;
 	}
@@ -109,7 +128,7 @@ public class Person {
 	public boolean isEnabled() {
 		return enabled;
 	}
-
+	
 	public void setActivities(Set<Activity> activities) {
 		this.activities = activities;
 		updateModified();
@@ -133,11 +152,11 @@ public class Person {
 		this.lastName = lastName;
 		updateModified();
 	}
-	
+
 	public void setModified(String modified) {
 		this.modified = modified;
 	}
-
+	
 	public void setNumpers(int numpers) {
 		this.numpers = numpers;
 		updateModified();
@@ -161,6 +180,10 @@ public class Person {
 	public void setReceived(Set<Payment> received) {
 		this.received = received;
 		updateModified();
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 	public void setTasks(Set<Task> tasks) {
