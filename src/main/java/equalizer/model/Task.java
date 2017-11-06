@@ -31,16 +31,42 @@ public class Task {
     private Activity activity;
 	
 	private String name;
+	private String description;
 	private String modified;
+
 	private boolean calculated;
+
 	private double ammount;
-		
-	public long getId() {
-		return id;
-	}
 	
 	public Activity getActivity() {
 		return activity;
+	}
+	public double getAmmount() {
+		return ammount;
+	}
+		
+	public String getDescription() {
+		return description;
+	}
+	
+	public long getId() {
+		return id;
+	}
+
+	public String getModified() {
+		return modified;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public Person getOwner() {
+		return owner;
+	}
+	
+	public boolean isCalculated() {
+		return calculated;
 	}
 
 	public void setActivity(Activity activity) {
@@ -48,35 +74,9 @@ public class Task {
 		updateModified();
 	}
 
-	public String getModified() {
-		return modified;
-	}
-
-	public void setModified(String modified) {
-		this.modified = modified;
+	public void setAmmount(double ammount) {
+		this.ammount = ammount;
 		updateModified();
-	}
-	
-	public Person getOwner() {
-		return owner;
-	}
-
-	public void setOwner(Person owner) {
-		this.owner = owner;
-		updateModified();
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-		updateModified();
-	}
-
-	public boolean isCalculated() {
-		return calculated;
 	}
 
 	public void setCalculated(boolean calculated) {
@@ -84,12 +84,22 @@ public class Task {
 		updateModified();
 	}
 
-	public double getAmmount() {
-		return ammount;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
-	public void setAmmount(double ammount) {
-		this.ammount = ammount;
+	public void setModified(String modified) {
+		this.modified = modified;
+		updateModified();
+	}
+
+	public void setName(String name) {
+		this.name = name;
+		updateModified();
+	}
+
+	public void setOwner(Person owner) {
+		this.owner = owner;
 		updateModified();
 	}
 

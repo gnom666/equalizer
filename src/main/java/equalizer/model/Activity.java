@@ -48,15 +48,20 @@ public class Activity {
 	
 	private String name;
 	private String modified;
+	private String description;
 	private Date date;
-	
+
 	private boolean calculated = false;
+
 	private double total = 0.0;
-		
+	
 	public Date getDate() {
 		return date;
 	}
-
+	public String getDescription() {
+		return description;
+	}
+		
 	public long getId() {
 		return id;
 	}
@@ -72,11 +77,11 @@ public class Activity {
 	public Person getOwner() {
 		return owner;
 	}
-	
+
 	public List<Person> getParticipants() {
 		return participants;
 	}
-
+	
 	public List<Payment> getPayments() {
 		return payments;
 	}
@@ -88,11 +93,11 @@ public class Activity {
 	public double getTotal() {
 		return total;
 	}
-	
+
 	public boolean isCalculated() {
 		return calculated;
 	}
-
+	
 	public void setCalculated(boolean calculated) {
 		this.calculated = calculated;
 		updateModified();
@@ -101,6 +106,10 @@ public class Activity {
 	public void setDate(Date date) {
 		this.date = date;
 		updateModified();
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public void setModified(String modified) {

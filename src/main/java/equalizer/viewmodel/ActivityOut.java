@@ -15,11 +15,12 @@ public class ActivityOut {
 	public String name;
 	public String modified;
 	public String date;
+	public String description;
 	public boolean calculated;
 	public double total = 0.0;
 	
 	public ActivityOut(long id, String owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
-			String modified, String date, boolean calculated, double total) {
+			String modified, String date, String description, boolean calculated, double total) {
 		this.id = id;
 		this.owner = owner;
 		this.participants = participants;
@@ -28,6 +29,7 @@ public class ActivityOut {
 		this.name = name;
 		this.modified = modified;
 		this.date = date;
+		this.description = description;
 		this.calculated = calculated;
 		this.total = total;
 	}
@@ -48,6 +50,7 @@ public class ActivityOut {
 			this.name = activity.getName();
 			this.modified = activity.getModified();
 			this.date = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(activity.getDate());
+			this.description = activity.getDescription();
 			this.calculated = activity.isCalculated();
 			this.total = activity.getTotal();
 		}
