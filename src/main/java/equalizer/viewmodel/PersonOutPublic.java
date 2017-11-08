@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import equalizer.model.Person;
+import equalizer.controlermodel.Error;
 
 public class PersonOutPublic {
 	
@@ -20,10 +21,11 @@ public class PersonOutPublic {
 	public String email;
 	public int numpers;
 	public boolean enabled;
+	public Error error;
 	
 	public PersonOutPublic(long id, List<Long> owns, List<Long> activities, List<Long> tasks, List<Long> paid,
 			List<Long> received, String firstName, String lastName, String modified, String email,
-			int numpers, boolean enabled) {
+			int numpers, boolean enabled, Error error) {
 		this.id = id;
 		this.owns = owns;
 		this.activities = activities;
@@ -36,6 +38,7 @@ public class PersonOutPublic {
 		this.email = email;
 		this.numpers = numpers;
 		this.enabled = enabled;
+		this.error = error;
 	}
 	
 	public PersonOutPublic(Person person) {
@@ -59,6 +62,7 @@ public class PersonOutPublic {
 			this.email = person.getEmail();
 			this.numpers = person.getNumpers();
 			this.enabled = person.isEnabled();
+			this.error = person.getError();
 		}
 	}
 	

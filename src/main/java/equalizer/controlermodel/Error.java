@@ -19,6 +19,13 @@ public class Error {
 		this.timestamp = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(Calendar.getInstance().getTime());
 	}
 	
+	public Error(Error error) {
+		this.code = error.code;
+		this.type = error.type;
+		this.description = error.description;
+		this.timestamp = error.timestamp;
+	}
+	
 	public Error updateError(ErrorCode code, ErrorType type, String description) {
 		this.code = code;
 		this.type = type;

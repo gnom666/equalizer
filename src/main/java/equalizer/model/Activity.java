@@ -1,6 +1,7 @@
 package equalizer.model;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -15,9 +16,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import equalizer.controlermodel.Error;
 
 @Entity
 public class Activity { 
@@ -55,17 +59,31 @@ public class Activity {
 
 	private double total = 0.0;
 	
+	@Transient
+	private Error error = null;
+	
+	public Activity() {
+		this.participants = new ArrayList<>();
+		this.tasks = new ArrayList<>();
+		this.payments = new ArrayList<>();
+		this.owner = new Person();
+	}
+
 	public Date getDate() {
 		return date;
 	}
+	
 	public String getDescription() {
 		return description;
 	}
-		
+	
+	public Error getError() {
+		return error;
+	}
 	public long getId() {
 		return id;
 	}
-
+		
 	public String getModified() {
 		return modified;
 	}
@@ -81,11 +99,11 @@ public class Activity {
 	public List<Person> getParticipants() {
 		return participants;
 	}
-	
+
 	public List<Payment> getPayments() {
 		return payments;
 	}
-
+	
 	public List<Task> getTasks() {
 		return tasks;
 	}
@@ -97,12 +115,12 @@ public class Activity {
 	public boolean isCalculated() {
 		return calculated;
 	}
-	
+
 	public void setCalculated(boolean calculated) {
 		this.calculated = calculated;
 		updateModified();
 	}
-
+	
 	public void setDate(Date date) {
 		this.date = date;
 		updateModified();
@@ -110,6 +128,11 @@ public class Activity {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Activity setError(Error error) {
+		this.error = error;
+		return this;
 	}
 
 	public void setModified(String modified) {

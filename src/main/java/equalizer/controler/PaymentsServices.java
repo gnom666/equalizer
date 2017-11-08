@@ -15,6 +15,7 @@ import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Node;
 import equalizer.controlermodel.Row;
+import equalizer.controlermodel.Table;
 import equalizer.controlermodel.Constants.*;
 import equalizer.model.Activity;
 import equalizer.model.Payment;
@@ -128,6 +129,7 @@ public class PaymentsServices {
 			if (r.difference < 0) negatives.add(new Node(r.personId, -r.difference));
 			if (r.difference > 0) positives.add(new Node(r.personId, r.difference));
 		}
+		System.out.println((new Table (table)).formatedString());
 		//*/
 		//* determinar pagos
 		Collections.sort(positives);
@@ -174,12 +176,12 @@ public class PaymentsServices {
 								    		 @RequestParam(value="pId", defaultValue="") long personId, 
 								    		 @RequestParam(value="redo", defaultValue="false") boolean reDo) {
     	
+		List<PaymentOut> result = new ArrayList<>();
 		Activity act = activityRepo.findById(activityId);
 		Person per = personRepo.findById(personId);
 		if (act != null && per!= null && per.getEmail() == act.getOwner().getEmail()) {
 			
-			ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
-			calculatePayments(act, per, reDo).forEach(p->paymentsOutList.add(new PaymentOut(p)));
+			calculatePayments(act, per, reDo).forEach(p->result.add(new PaymentOut(p)));
 						
 			act.setCalculated(true);
 			activityRepo.save(act);
@@ -188,36 +190,39 @@ public class PaymentsServices {
 				t.setCalculated(true);
 				taskRepo.save(t);
 			});
-			
-			return paymentsOutList;
 		}
 		
-		eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.UNKNOWN, "Unknown");
 		if (act == null) {
-			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity Id not found");
-		}
-		if (per == null) {
-			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person Id not found");
-		}
-		if (per.getEmail() == act.getOwner().getEmail()) {
-			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITYOWNER_MISSMATCH, "Person Id is different than actuvity owner Id");
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity Id not found"))));
+		}	else if (per == null) {
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person Id not found"))));
+		}	else if (per.getEmail() != act.getOwner().getEmail()) {
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITYOWNER_MISSMATCH, "Person Id is different than actuvity owner Id"))));
 		}
 		
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/testpayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PaymentOut> testPayments(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
+		List<PaymentOut> result = new ArrayList<>();
 		Activity act = activityRepo.findById(activityId);
 		if (act != null) {
-			ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
-			calculatePayments(act, null, false).forEach(p->paymentsOutList.add(new PaymentOut(p)));
-			return paymentsOutList;
+			calculatePayments(act, null, false).forEach(p->result.add(new PaymentOut(p)));
+		}	else {
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 		}
 		
-		eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.GET)
@@ -234,6 +239,7 @@ public class PaymentsServices {
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.DELETE)
     public List<PaymentOut> deletePaymentsByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
+		List<PaymentOut> result = new ArrayList<>();
 		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
 			List<Payment> paymentsList =  paymentsRepo.removeByActivity(activity);
@@ -243,18 +249,20 @@ public class PaymentsServices {
 				t.setCalculated(false);
 				taskRepo.save(t);
 			});
-			ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
-			paymentsList.forEach(p->paymentsOutList.add(new PaymentOut(p)));		
-			
-			return paymentsOutList;
+			paymentsList.forEach(p->result.add(new PaymentOut(p)));		
+		}	else {
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 		}
-		eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
-		return null;
+		
+		return result;
     }
 	
 	@RequestMapping(value="/paymentsbyfrom", method=RequestMethod.GET)
     public List<PaymentOut> paymentsByFrom(@RequestParam(value="fId", defaultValue="0") long fromId) {
     	
+		List<PaymentOut> result = new ArrayList<>();
 		Person person = personRepo.findById(fromId);
 		if (person != null) {
 			List<Payment> paymentsList = paymentsRepo.findByFrom(person);
@@ -269,27 +277,30 @@ public class PaymentsServices {
 			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found");
 		}
 				
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/paymentsbyto", method=RequestMethod.GET)
     public List<PaymentOut> paymentsByTo(@RequestParam(value="tId", defaultValue="0") long toId) {
     	
+		List<PaymentOut> result = new ArrayList<>();
 		Person person = personRepo.findById(toId);
 		if (person != null) {
 			List<Payment> paymentsList = paymentsRepo.findByTo(person);
 			if (paymentsList != null) {
-				List<PaymentOut> paymentsOutList = new ArrayList<>();
-				paymentsList.forEach(p->paymentsOutList.add(new PaymentOut(p)));
-				return paymentsOutList;
+				paymentsList.forEach(p->result.add(new PaymentOut(p)));
 			}	else {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
+				result.add(	new PaymentOut(
+								new Payment()
+								.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 			}
 		} 	else {
-			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found");
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found"))));
 		}
 				
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/makepay", method=RequestMethod.GET)
@@ -303,14 +314,14 @@ public class PaymentsServices {
 				payment.setStatus(PaymentStatus.REQUESTED);
 				paymentsRepo.save(payment);
 			}	else {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id"));
 			}
 		}	else {
 			if (payment == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found"));
 			}
 			if (person == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found"));
 			}
 		}
 		
@@ -328,14 +339,14 @@ public class PaymentsServices {
 				payment.setStatus(PaymentStatus.PAID);
 				paymentsRepo.save(payment);
 			}	else {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment to is different to person Id");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment to is different to person Id"));
 			}
 		}	else {
 			if (payment == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found"));
 			}
 			if (person == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found"));
 			}
 		}
 		
@@ -353,14 +364,14 @@ public class PaymentsServices {
 				payment.setStatus(PaymentStatus.CONFLICT);
 				paymentsRepo.save(payment);
 			}	else {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_USERMISSMATCH, "Payment from is different to person Id"));
 			}
 		}	else {
 			if (payment == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found"));
 			}
 			if (person == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found"));
 			}
 		}
 		
@@ -376,12 +387,10 @@ public class PaymentsServices {
 				payment.setStatus(PaymentStatus.PENDING);
 				paymentsRepo.save(payment);
 			}	else {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_CLOSED, "Payment is already closed");
+				payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_CLOSED, "Payment is already closed"));
 			}
 		}	else {
-			if (payment == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
-			}
+			payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found"));
 		}
 		
 		return new PaymentOut(payment);
@@ -395,9 +404,7 @@ public class PaymentsServices {
 			payment.setStatus(PaymentStatus.PENDING);
 			paymentsRepo.save(payment);
 		}	else {
-			if (payment == null) {
-				eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found");
-			}
+			payment = new Payment().setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found"));
 		}
 		
 		return new PaymentOut(payment);

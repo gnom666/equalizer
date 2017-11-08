@@ -9,9 +9,15 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import equalizer.controlermodel.Constants;
+import equalizer.controlermodel.Error;
 
 @Entity
 public class Task { 
@@ -38,21 +44,33 @@ public class Task {
 
 	private double ammount;
 	
+	@Transient
+	private Error error = null;
+	
+	public Task() {
+		this.owner = new Person();
+		this.activity = new Activity();
+	}
+
 	public Activity getActivity() {
 		return activity;
 	}
+	
 	public double getAmmount() {
 		return ammount;
 	}
-		
+	
 	public String getDescription() {
 		return description;
 	}
-	
+	public Error getError() {
+		return error;
+	}
+		
 	public long getId() {
 		return id;
 	}
-
+	
 	public String getModified() {
 		return modified;
 	}
@@ -64,11 +82,11 @@ public class Task {
 	public Person getOwner() {
 		return owner;
 	}
-	
+
 	public boolean isCalculated() {
 		return calculated;
 	}
-
+	
 	public void setActivity(Activity activity) {
 		this.activity = activity;
 		updateModified();
@@ -86,6 +104,11 @@ public class Task {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public Task setError(Error error) {
+		this.error = error;
+		return this;
 	}
 
 	public void setModified(String modified) {

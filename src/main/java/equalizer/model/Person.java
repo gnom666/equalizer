@@ -1,27 +1,27 @@
 package equalizer.model;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import equalizer.controlermodel.Error;
 
 
 @Entity
@@ -34,23 +34,23 @@ public class Person {
 
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Activity.class)
 	@OneToMany(mappedBy = "owner")
-	private Set<Activity> owns;
+	private List<Activity> owns;
 
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Activity.class)
 	@ManyToMany(mappedBy = "participants")
-	private Set<Activity> activities;
+	private List<Activity> activities;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Task.class)
 	@OneToMany(mappedBy = "owner")
-	private Set<Task> tasks;
+	private List<Task> tasks;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payment.class)
 	@OneToMany(mappedBy = "from")
-	private Set<Payment> paid;
+	private List<Payment> paid;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Payment.class)
 	@OneToMany(mappedBy = "to")
-	private Set<Payment> received;
+	private List<Payment> received;
 	
 	private String firstName;
 	private String lastName;
@@ -74,12 +74,27 @@ public class Person {
     @JoinColumn(name="role")
     private Role role;
 	
-	public Set<Activity> getActivities() {
+	@Transient
+	private Error error = null;
+	
+	public Person() {
+		this.owns = new ArrayList<>();
+		this.activities = new ArrayList<>();
+		this.tasks = new ArrayList<>();
+		this.paid = new ArrayList<>();
+		this.received = new ArrayList<>();
+	}
+
+	public List<Activity> getActivities() {
 		return activities;
 	}
 
 	public String getEmail() {
 		return email;
+	}
+
+	public Error getError() {
+		return error;
 	}
 
 	public String getFirstName() {
@@ -89,23 +104,23 @@ public class Person {
 	public long getId() {
 		return id;
 	}
+
 	public String getLastName() {
 		return lastName;
 	}
-	
 	public String getModified() {
 		return modified;
 	}
-
+	
 	public int getNumpers() {
 		return numpers;
 	}
 
-	public Set<Activity> getOwns() {
+	public List<Activity> getOwns() {
 		return owns;
 	}
 
-	public Set<Payment> getPaid() {
+	public List<Payment> getPaid() {
 		return paid;
 	}
 
@@ -113,7 +128,7 @@ public class Person {
 		return password;
 	}
 
-	public Set<Payment> getReceived() {
+	public List<Payment> getReceived() {
 		return received;
 	}
 
@@ -121,19 +136,19 @@ public class Person {
 		return role;
 	}
 
-	public Set<Task> getTasks() {
+	public List<Task> getTasks() {
 		return tasks;
 	}
-	
+
 	public boolean isEnabled() {
 		return enabled;
 	}
 	
-	public void setActivities(Set<Activity> activities) {
+	public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 		updateModified();
 	}
-
+	
 	public void setEmail(String email) {
 		this.email = email;
 		updateModified();
@@ -141,6 +156,11 @@ public class Person {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public Person setError(Error error) {
+		this.error = error;
+		return this;
 	}
 
 	public void setFirstName(String firstName) {
@@ -162,12 +182,12 @@ public class Person {
 		updateModified();
 	}
 
-	public void setOwns(Set<Activity> owns) {
+	public void setOwns(List<Activity> owns) {
 		this.owns = owns;
 		updateModified();
 	}
 
-	public void setPaid(Set<Payment> paid) {
+	public void setPaid(List<Payment> paid) {
 		this.paid = paid;
 		updateModified();
 	}
@@ -177,7 +197,7 @@ public class Person {
 		updateModified();
 	}
 
-	public void setReceived(Set<Payment> received) {
+	public void setReceived(List<Payment> received) {
 		this.received = received;
 		updateModified();
 	}
@@ -186,7 +206,7 @@ public class Person {
 		this.role = role;
 	}
 
-	public void setTasks(Set<Task> tasks) {
+	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 		updateModified();
 	}

@@ -18,6 +18,7 @@ import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
+import equalizer.viewmodel.ActivityOut;
 import equalizer.viewmodel.TaskOut;
 
 @RestController
@@ -39,53 +40,57 @@ public class TasksServices {
 	@RequestMapping(value="/tasksbyact", method=RequestMethod.GET)
     public List<TaskOut> tasksByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
+		List<TaskOut> result = new ArrayList<>();
 		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
 			List<Task> tasksList =  taskRepo.findByActivity(activity);
-			ArrayList<TaskOut> tasksOutList = new ArrayList<>();
-			tasksList.forEach(t->tasksOutList.add(new TaskOut(t)));		
-			
-			return tasksOutList;
+			tasksList.forEach(t->result.add(new TaskOut(t)));		
+		}	else {
+			result.add(new TaskOut(
+					new Task()
+					.setError(eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 		}
-		eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/tasksbyowner", method=RequestMethod.GET)
     public List<TaskOut> tasksByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
+		List<TaskOut> result = new ArrayList<>();
 		Person owner = personRepo.findById(ownerId);
 		if (owner != null) {
 			List<Task> tasksList =  taskRepo.findByOwner(owner);
-			ArrayList<TaskOut> tasksOutList = new ArrayList<>();
-			tasksList.forEach(t->tasksOutList.add(new TaskOut(t)));		
-			
-			return tasksOutList;
+			tasksList.forEach(t->result.add(new TaskOut(t)));
+		}	else {
+			result.add(new TaskOut(
+					new Task()
+					.setError(eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found"))));
 		}
-		eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/tasksbyactandowner", method=RequestMethod.GET)
     public List<TaskOut> tasksByActivityAndOwner(@RequestParam(value="aId", defaultValue="0") long activityId, 
     											 @RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
+		List<TaskOut> result = new ArrayList<>();
 		Activity activity = activityRepo.findById(activityId);
 		Person owner = personRepo.findById(ownerId);
 		if (activity != null && owner != null) {
 			List<Task> tasksList =  taskRepo.findByActivityAndOwner(activity, owner);
-			ArrayList<TaskOut> tasksOutList = new ArrayList<>();
-			tasksList.forEach(t->tasksOutList.add(new TaskOut(t)));		
-			
-			return tasksOutList;
+			tasksList.forEach(t->result.add(new TaskOut(t)));		
 		}
 		if (activity == null) {
-			eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
+			result.add(new TaskOut(
+					new Task()
+					.setError(eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 		}
 		if (owner == null) {
-			eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found");
+			result.add(new TaskOut(
+					new Task()
+					.setError(eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found"))));
 		}
 		
-		return null;
+		return result;
     }
 }

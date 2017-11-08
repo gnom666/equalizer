@@ -26,6 +26,10 @@ public class PersonDetails implements UserDetails {
 		auth.add(new SimpleGrantedAuthority(Constants.roleTypeName(person.getRole().getRoleType())));
 		this.authorities = auth;
 	}
+	
+	public PersonDetails() {
+		this.authorities = new ArrayList<>();
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {

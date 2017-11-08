@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import equalizer.model.Activity;
+import equalizer.controlermodel.Error;
 
 public class ActivityOut {
 	public long id;
@@ -18,9 +19,10 @@ public class ActivityOut {
 	public String description;
 	public boolean calculated;
 	public double total = 0.0;
+	public Error error;
 	
 	public ActivityOut(long id, String owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
-			String modified, String date, String description, boolean calculated, double total) {
+			String modified, String date, String description, boolean calculated, double total, Error error) {
 		this.id = id;
 		this.owner = owner;
 		this.participants = participants;
@@ -32,6 +34,7 @@ public class ActivityOut {
 		this.description = description;
 		this.calculated = calculated;
 		this.total = total;
+		this.error = error;
 	}
 	
 	public ActivityOut(Activity activity) {
@@ -53,6 +56,7 @@ public class ActivityOut {
 			this.description = activity.getDescription();
 			this.calculated = activity.isCalculated();
 			this.total = activity.getTotal();
+			this.error = activity.getError();
 		}
 	}
 		

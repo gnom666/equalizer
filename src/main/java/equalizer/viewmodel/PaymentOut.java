@@ -2,6 +2,7 @@ package equalizer.viewmodel;
 
 import equalizer.controlermodel.Constants.PaymentStatus;
 import equalizer.model.Payment;
+import equalizer.controlermodel.Error;
 
 public class PaymentOut {
 	
@@ -12,8 +13,10 @@ public class PaymentOut {
 	public String modified;
 	public double ammount;
 	public PaymentStatus status;
+	public Error error;
 		
-	public PaymentOut (long id, long from, long to, long activity, String modified, double ammount, PaymentStatus status) {
+	public PaymentOut (long id, long from, long to, long activity, String modified, double ammount, PaymentStatus status
+			, Error error) {
 		this.id = id;
 		this.from = from;
 		this.to = to;
@@ -21,6 +24,7 @@ public class PaymentOut {
 		this.modified = modified;
 		this.ammount = ammount;
 		this.status = status;
+		this.error = error;
 	}
 	
 	public PaymentOut (Payment payments) {
@@ -32,6 +36,7 @@ public class PaymentOut {
 			this.modified = payments.getModified();
 			this.ammount = payments.getAmmount();
 			this.status = payments.getStatus();
+			this.error = payments.getError();
 		}
 	}
 	

@@ -1,7 +1,5 @@
 package equalizer;
 
-import java.util.function.Supplier;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,7 +24,7 @@ public class Application {
 			
 			@Override
 			public UserDetails loadUserByUsername(String arg0) throws UsernameNotFoundException {
-				return new PersonDetails(personRepo.findByEmail(arg0).get());
+				return new PersonDetails(personRepo.findByEmail(arg0));
 			}
 		});
 	}

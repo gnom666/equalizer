@@ -35,40 +35,46 @@ public class ActivitiesServices {
 	@RequestMapping(value="/activitiesbyowner", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
+		List<ActivityOut> result = new ArrayList<>();
 		Person owner = personRepo.findById(ownerId);
 		if (owner != null) {
 			List<Activity> activitiesList = activityRepo.findByOwner(owner);
 			if (activitiesList != null) {
-				List<ActivityOut> activitiesOutList = new ArrayList<>();
-				activitiesList.forEach(a->activitiesOutList.add(new ActivityOut(a)));
-				return activitiesOutList;
+				activitiesList.forEach(a->result.add(new ActivityOut(a)));
 			}	else {
-				eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
+				result.add(new ActivityOut(
+						new Activity()
+						.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 			}
 		} 	else {
-			eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found");
+			result.add(new ActivityOut(
+					new Activity()
+					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found"))));
 		}		
 		
-		return null;
+		return result;
     }
 	
 	@RequestMapping(value="/activitiesbyparticipant", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="0") long personId) {
     	
+		List<ActivityOut> result = new ArrayList<>();
 		Person person = personRepo.findById(personId);
 		if (person != null) {
 			List<Activity> activitiesList = activityRepo.findByParticipantsIn(person);
 			if (activitiesList != null) {
-				List<ActivityOut> activitiesOutList = new ArrayList<>();
-				activitiesList.forEach(a->activitiesOutList.add(new ActivityOut(a)));
-				return activitiesOutList;
+				activitiesList.forEach(a->result.add(new ActivityOut(a)));
 			}	else {
-				eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found");
+				result.add(new ActivityOut(
+						new Activity()
+						.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found"))));
 			}
 		} 	else {
-			eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found");
+			result.add(new ActivityOut(
+					new Activity()
+					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found"))));
 		}		
 
-		return null;
+		return result;
     }
 }
