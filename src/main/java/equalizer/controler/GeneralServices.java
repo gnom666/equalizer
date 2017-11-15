@@ -21,6 +21,11 @@ import equalizer.repository.PersonRepository;
 import equalizer.repository.RoleRepository;
 import equalizer.repository.TaskRepository;
 
+/**
+ * General Services
+ * @author jorgerios
+ *
+ */
 @RestController
 @RequestMapping("/general")
 public class GeneralServices {
@@ -43,6 +48,10 @@ public class GeneralServices {
 	@Autowired
 	private EqualizerConfiguration eConf;
 	
+	/**
+	 * Fills the database with some coherent data to do tests 
+	 * @return Log String
+	 */
 	@RequestMapping(value="/init", method=RequestMethod.GET)
     public String init() {
     	StringBuffer result = new StringBuffer();

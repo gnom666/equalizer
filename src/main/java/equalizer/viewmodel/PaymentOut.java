@@ -4,6 +4,11 @@ import equalizer.controlermodel.Constants.PaymentStatus;
 import equalizer.model.Payment;
 import equalizer.controlermodel.Error;
 
+/**
+ * Class to be used as interface of the Payment class by the paymentsServices methods
+ * @author jorgerios
+ *
+ */
 public class PaymentOut {
 	
 	public long id;

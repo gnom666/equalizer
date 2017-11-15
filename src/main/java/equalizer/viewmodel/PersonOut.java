@@ -2,11 +2,15 @@ package equalizer.viewmodel;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import equalizer.model.Person;
 import equalizer.controlermodel.Error;
 
+/**
+ * Class to be used as interface of the Person class by the personServices methods
+ * @author jorgerios
+ *
+ */
 public class PersonOut {
 	
 	public long id;
@@ -67,6 +71,14 @@ public class PersonOut {
 			this.enabled = person.isEnabled();
 			this.error = person.getError();
 		}
+	}
+	
+	public PersonOut toPublic() {
+		
+		this.password = "";
+		this.modified = "";
+		
+		return this;
 	}
 	
 }

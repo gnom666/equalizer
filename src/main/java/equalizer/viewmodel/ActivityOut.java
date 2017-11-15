@@ -7,9 +7,15 @@ import java.util.List;
 import equalizer.model.Activity;
 import equalizer.controlermodel.Error;
 
+/**
+ * Class to be used as interface of the Activity class by the activitiesServices methods
+ * @author jorgerios
+ * 
+ */
 public class ActivityOut {
+	
 	public long id;
-	public String owner;
+	public long owner;
 	public List<Long> participants;
 	public List<Long> tasks;
 	public List<Long> payments;
@@ -21,7 +27,7 @@ public class ActivityOut {
 	public double total = 0.0;
 	public Error error;
 	
-	public ActivityOut(long id, String owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
+	public ActivityOut(long id, long owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
 			String modified, String date, String description, boolean calculated, double total, Error error) {
 		this.id = id;
 		this.owner = owner;
@@ -49,7 +55,7 @@ public class ActivityOut {
 			activity.getPayments().forEach(p->this.payments.add(p.getId()));
 			
 			this.id = activity.getId();
-			this.owner = activity.getOwner().getEmail();
+			this.owner = activity.getOwner().getId();
 			this.name = activity.getName();
 			this.modified = activity.getModified();
 			this.date = (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")).format(activity.getDate());

@@ -3,6 +3,11 @@ package equalizer.viewmodel;
 import equalizer.model.Task;
 import equalizer.controlermodel.Error;
 
+/**
+ * Class to be used as interface of the Task class by the tasksServices methods
+ * @author jorgerios
+ *
+ */
 public class TaskOut {
 
 	public long id;

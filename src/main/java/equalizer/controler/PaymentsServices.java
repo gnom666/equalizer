@@ -27,7 +27,11 @@ import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.PaymentOut;
 
-
+/**
+ * Payment Services
+ * @author jorgerios
+ *
+ */
 @RestController
 @RequestMapping("/payments")
 public class PaymentsServices {
@@ -47,6 +51,11 @@ public class PaymentsServices {
 	@Autowired
 	private EqualizerConfiguration eConf;
 	
+	/**
+	 * Truncates a value to two decimals
+	 * @param val
+	 * @return
+	 */
 	public double trunc2decimals (double val) {
 		double result = val*100;
 		result = (double)((int) result);
@@ -54,6 +63,11 @@ public class PaymentsServices {
 		return result;
 	}
 	
+	/**
+	 * Rounds a value to two decimals
+	 * @param val
+	 * @return
+	 */
 	public double round2decimals (double val) {
 		double result = val*100;
 		result = Math.round(result);
@@ -61,9 +75,18 @@ public class PaymentsServices {
 		return result;
 	}
 		
+	/**
+	 * Calculates all payments for an activity
+	 * @param act The activity
+	 * @param per The person that owns the activity
+	 * @param redo Whether or not re-do calculations
+	 * @return List of Payment
+	 */
 	private List<Payment> calculatePayments (Activity act, Person per, boolean redo) {
+		
 		List<Payment> generatedPayments = new ArrayList<>();
-		//* eliminar pagos previos en caso de recalculo
+		
+		//* eliminate previous payments if redo
 		List<Payment> deletedPayments = null;
 		// a new payment not calculated is a reason for redo
 		for (Task t : act.getTasks()) {
@@ -75,7 +98,7 @@ public class PaymentsServices {
 		}
 		
 		//*/
-		//* construir tabla para determinar diferencias
+		//* build differences table
 		ArrayList<Row> table = new ArrayList<>();
 		act.getParticipants().forEach(p->{
 			Row row = new Row();
@@ -90,7 +113,7 @@ public class PaymentsServices {
 			table.add(row);
 		});
 		//*/
-		//* calcular diferencias y totales
+		//* calculate differences and totals
 		if (table.isEmpty()) {
 			eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.TASK_NOT_FOUND, "Zero tasks found for this activity");
 			return generatedPayments;
@@ -131,7 +154,7 @@ public class PaymentsServices {
 		}
 		System.out.println((new Table (table)).formatedString());
 		//*/
-		//* determinar pagos
+		//* determine payments
 		Collections.sort(positives);
 		Collections.sort(negatives);
 		while (!positives.isEmpty() && !negatives.isEmpty()) {
@@ -155,7 +178,7 @@ public class PaymentsServices {
 				positives.pop();
 				negatives.pop();
 			}
-			// persistir
+			// persist
 			generatedPayments.add(pay);
 			if (!act.isCalculated() || redo) {
 				paymentsRepo.save(pay);
@@ -171,6 +194,13 @@ public class PaymentsServices {
 		return generatedPayments;
 	}
 	
+	/**
+	 * Generates an activity's payments
+	 * @param activityId The Id of the activity
+	 * @param personId The Id of the activity's owner
+	 * @param reDo Re-do or not the calculations
+	 * @return List of PaymentOut
+	 */
 	@RequestMapping(value="/generatepayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PaymentOut> generatePayments(@RequestParam(value="aId", defaultValue="0") long activityId, 
 								    		 @RequestParam(value="pId", defaultValue="") long personId, 
@@ -209,6 +239,11 @@ public class PaymentsServices {
 		return result;
     }
 	
+	/**
+	 * Tests the calculations of an activity's payments without persisting them
+	 * @param activityId The Id of the activity
+	 * @return List of PaymentOut
+	 */
 	@RequestMapping(value="/testpayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PaymentOut> testPayments(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
@@ -225,6 +260,11 @@ public class PaymentsServices {
 		return result;
     }
 	
+	/**
+	 * Lists all the payments of an activity
+	 * @param activityId The Id of the activity
+	 * @return List of PaymentOut
+	 */
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.GET)
     public List<PaymentOut> testPaymentsByActivity(@RequestParam(value="aId", defaultValue="0") String activityId) {
     	
@@ -236,6 +276,11 @@ public class PaymentsServices {
 		return paymentsOutList;
     }
 	
+	/**
+	 * Deletes all the payments of an activity
+	 * @param activityId The Id of the activity
+	 * @return List of PaymentOut
+	 */
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.DELETE)
     public List<PaymentOut> deletePaymentsByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
@@ -259,6 +304,11 @@ public class PaymentsServices {
 		return result;
     }
 	
+	/**
+	 * Lists all the payments from a person
+	 * @param fromId The Id of the person
+	 * @return List of PaymentOut
+	 */
 	@RequestMapping(value="/paymentsbyfrom", method=RequestMethod.GET)
     public List<PaymentOut> paymentsByFrom(@RequestParam(value="fId", defaultValue="0") long fromId) {
     	
@@ -280,6 +330,11 @@ public class PaymentsServices {
 		return result;
     }
 	
+	/**
+	 * Lists all the payments to a person
+	 * @param fromId The Id of the person
+	 * @return List of PaymentOut
+	 */
 	@RequestMapping(value="/paymentsbyto", method=RequestMethod.GET)
     public List<PaymentOut> paymentsByTo(@RequestParam(value="tId", defaultValue="0") long toId) {
     	
@@ -303,6 +358,12 @@ public class PaymentsServices {
 		return result;
     }
 	
+	/**
+	 * Sets the payment status to Requested. The 'from' person supposedly made the payment
+	 * @param fromId The Id of the person that should made the payment
+	 * @param paymentId The Id of the payment
+	 * @return PaymentOut
+	 */
 	@RequestMapping(value="/makepay", method=RequestMethod.GET)
     public PaymentOut makePayment(@RequestParam(value="fId", defaultValue="0") long fromId, 
     							  @RequestParam(value="pId", defaultValue="") long paymentId) {
@@ -328,6 +389,12 @@ public class PaymentsServices {
 		return new PaymentOut(payment);
     }
 	
+	/**
+	 * Set the payment status to Paid. The 'to' person accepts the Requested payment status
+	 * @param toId The Id of the person that should receive the payment
+	 * @param paymentId The Id of the payment
+	 * @return PaymentOut
+	 */
 	@RequestMapping(value="/acceptpay", method=RequestMethod.GET)
     public PaymentOut acceptPayment(@RequestParam(value="tId", defaultValue="0") long toId, 
     								@RequestParam(value="pId", defaultValue="") long paymentId) {
@@ -353,6 +420,12 @@ public class PaymentsServices {
 		return new PaymentOut(payment);
     }
 	
+	/**
+	 * Sets the payment status to Conflict. The 'to' person rejects the Requested payment status
+	 * @param toId The Id of the person that should receive the payment
+	 * @param paymentId The Id of the payment
+	 * @return PaymentOut
+	 */
 	@RequestMapping(value="/suepay", method=RequestMethod.GET)
     public PaymentOut suePayment(@RequestParam(value="tId", defaultValue="0") long toId, 
     							 @RequestParam(value="pId", defaultValue="") long paymentId) {
@@ -378,6 +451,11 @@ public class PaymentsServices {
 		return new PaymentOut(payment);
     }
 	
+	/**
+	 * Sets the payment status to Pending, but only if the current status isn't Paid
+	 * @param paymentId The Id of the payment
+	 * @return PaymentOut
+	 */
 	@RequestMapping(value="/resetpay", method=RequestMethod.GET)
     public PaymentOut resetPayment(@RequestParam(value="pId", defaultValue="0") long paymentId) {
     	
@@ -396,6 +474,11 @@ public class PaymentsServices {
 		return new PaymentOut(payment);
     }
 	
+	/**
+	 * Sets the payment status to Pending
+	 * @param paymentId The Id of the payment
+	 * @return PaymentOut
+	 */
 	@RequestMapping(value="/forceresetpay", method=RequestMethod.GET)
     public PaymentOut forceResetPayment(@RequestParam(value="pId", defaultValue="0") long paymentId) {
     	
@@ -410,6 +493,10 @@ public class PaymentsServices {
 		return new PaymentOut(payment);
     }
 	
+	/**
+	 * Returns the last error occurred 
+	 * @return Error
+	 */
 	@RequestMapping(value="/lasterror", method=RequestMethod.GET)
     public Error getLastError() {
 		return eConf.lastError();

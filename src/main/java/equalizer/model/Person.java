@@ -23,7 +23,11 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import equalizer.controlermodel.Error;
 
-
+/**
+ * Class that represents the Person or a group of Persons
+ * @author jorgerios
+ *
+ */
 @Entity
 public class Person { 
 	

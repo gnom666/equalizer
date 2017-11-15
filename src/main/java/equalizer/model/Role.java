@@ -17,6 +17,11 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Constants.RoleType;
 
+/**
+ * Class that represents the different roles of a Person
+ * @author jorgerios
+ *
+ */
 @Entity
 public class Role {
 

@@ -26,10 +26,10 @@ public class Table {
 	public String formatedString () {
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append("\nid\tnumP\ttPaid\t\tpaidP\t\tdiff\t\textra\t\t\n"
-				+ "---------------------------------------------------------------------\n");
+		sb.append("\n id\tnumP\ttPaid\t\tpaidP\t\tdiff\t\textra\t\t\n"
+				+ " --------------------------------------------------------------------\n");
 		rows.forEach(r -> {
-			sb.append(r.personId + "\t"
+			sb.append(" " + r.personId + "\t"
 					+ r.numPersons + "\t"
 					+ r.totalPaid + "\t\t"
 					+ r.paidPerPerson + "\t\t"

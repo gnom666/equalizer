@@ -18,7 +18,11 @@ import equalizer.repository.ActivityRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.viewmodel.ActivityOut;
 
-
+/**
+ * Activity Services
+ * @author jorgerios
+ *
+ */
 @RestController
 @RequestMapping("/activities")
 public class ActivitiesServices {
@@ -32,6 +36,11 @@ public class ActivitiesServices {
 	@Autowired
 	private EqualizerConfiguration eConf;
 	
+	/**
+	 * List all activities owned by a person
+	 * @param ownerId The Id of the person
+	 * @return List of ActivityOut
+	 */
 	@RequestMapping(value="/activitiesbyowner", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
@@ -55,6 +64,11 @@ public class ActivitiesServices {
 		return result;
     }
 	
+	/**
+	 * Lists all activities which a person has participated in
+	 * @param personId The Id of the person
+	 * @return List of ActivityOut
+	 */
 	@RequestMapping(value="/activitiesbyparticipant", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="0") long personId) {
     	
@@ -75,6 +89,19 @@ public class ActivitiesServices {
 					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Owner not found"))));
 		}		
 
+		return result;
+    }
+	
+	/**
+	 * Lists all activities containing a given name
+	 * @param name The name or part of it
+	 * @return List of ActivityOut
+	 */
+	@RequestMapping(value="/activitiesbyname", method=RequestMethod.GET)
+    public List<ActivityOut> getActivitiesByName(@RequestParam(value="name", defaultValue="") String name) {
+    	
+		List<ActivityOut> result = new ArrayList<>();
+		activityRepo.findByNameContaining(name).forEach(a -> result.add(new ActivityOut(a)));
 		return result;
     }
 }

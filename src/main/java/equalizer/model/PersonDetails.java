@@ -10,6 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import equalizer.controlermodel.Constants;
 
+/**
+ * Class used for OAuth to connect with a Person
+ * @author jorgerios
+ *
+ */
 public class PersonDetails implements UserDetails {
 
 	private String username;

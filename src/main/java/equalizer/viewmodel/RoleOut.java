@@ -8,6 +8,11 @@ import equalizer.controlermodel.Constants.RoleType;
 import equalizer.model.Role;
 import equalizer.controlermodel.Error;
 
+/**
+ * Class to be used as interface of the Role class by the roleServices and personServices methods
+ * @author jorgerios
+ *
+ */
 public class RoleOut {
 	
 	public long id;

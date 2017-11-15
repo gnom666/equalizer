@@ -23,6 +23,11 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import equalizer.controlermodel.Error;
 
+/**
+ * Class that represents the activities or events made by a group of Persons
+ * @author jorgerios
+ *
+ */
 @Entity
 public class Activity { 
 

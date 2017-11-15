@@ -16,6 +16,8 @@ public interface ActivityRepository extends PagingAndSortingRepository<Activity,
 
 	List<Activity> findByName(@Param("name") String name);
 	
+	List<Activity> findByNameContaining(@Param("name") String name);
+	
 	Activity findById(@Param("id") long id);
 	
 	List<Activity> findByOwner(@Param("owner") Person owner);

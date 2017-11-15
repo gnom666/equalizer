@@ -17,6 +17,11 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Constants.PaymentStatus;
 
+/**
+ * Class that represents the different payments made by a Person A to a Person B for a specific Activity
+ * @author jorgerios
+ *
+ */
 @Entity
 public class Payment { 
 

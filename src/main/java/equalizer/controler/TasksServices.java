@@ -21,6 +21,11 @@ import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.ActivityOut;
 import equalizer.viewmodel.TaskOut;
 
+/**
+ * Tasks Services
+ * @author jorgerios
+ *
+ */
 @RestController
 @RequestMapping("/tasks")
 public class TasksServices {
@@ -37,6 +42,11 @@ public class TasksServices {
 	@Autowired
 	private EqualizerConfiguration eConf;
 	
+	/**
+	 * Lists the tasks for a specific activity
+	 * @param activityId The Id of the activity
+	 * @return List of TaskOut
+	 */
 	@RequestMapping(value="/tasksbyact", method=RequestMethod.GET)
     public List<TaskOut> tasksByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
     	
@@ -53,6 +63,11 @@ public class TasksServices {
 		return result;
     }
 	
+	/**
+	 * Lists the tasks owned by a specific person
+	 * @param ownerId The Id of the person
+	 * @return List of TaskOut
+	 */
 	@RequestMapping(value="/tasksbyowner", method=RequestMethod.GET)
     public List<TaskOut> tasksByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
@@ -69,6 +84,12 @@ public class TasksServices {
 		return result;
     }
 	
+	/**
+	 * Lists the tasks owned by a person for a specific activity
+	 * @param activityId The Id of the activity
+	 * @param ownerId The Id of the person
+	 * @return List TaskOut
+	 */
 	@RequestMapping(value="/tasksbyactandowner", method=RequestMethod.GET)
     public List<TaskOut> tasksByActivityAndOwner(@RequestParam(value="aId", defaultValue="0") long activityId, 
     											 @RequestParam(value="oId", defaultValue="0") long ownerId) {

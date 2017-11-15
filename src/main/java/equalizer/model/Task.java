@@ -19,6 +19,11 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import equalizer.controlermodel.Constants;
 import equalizer.controlermodel.Error;
 
+/**
+ * Class that represents the different tasks made by a Person for a specific Activity
+ * @author jorgerios
+ *
+ */
 @Entity
 public class Task { 
 
