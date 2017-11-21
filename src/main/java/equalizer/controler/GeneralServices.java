@@ -64,6 +64,7 @@ public class GeneralServices {
     	Person personC = new Person();
     	Person personD = new Person();
     	Activity halloween = new Activity();
+    	Activity thanksgiving = new Activity();
     	Task drinks = new Task();
     	Task rent = new Task();
     	Task transportation = new Task();
@@ -148,6 +149,15 @@ public class GeneralServices {
 	    	halloween.setDescription("Halloween party");
 	    	
 	    	activityRepo.save(halloween);
+	    	
+	    	thanksgiving.setDate(new Date());
+	    	thanksgiving.setName("Thanksgiving");
+	    	thanksgiving.setOwner(personB);
+	    	thanksgiving.setCalculated(false);
+	    	thanksgiving.setTotal(0);
+	    	thanksgiving.setDescription("Thanksgiving dinner");
+	    	
+	    	activityRepo.save(thanksgiving);
     	
     	}	catch (Exception e) {
     		result.append("ERROR\n");
@@ -168,6 +178,14 @@ public class GeneralServices {
     		halloween.setParticipants(participants);
     		
     		activityRepo.save(halloween);
+    		
+    		List<Person> participants2 = new ArrayList<>();
+    		participants2.add(personA);
+    		participants2.add(personB);
+    		participants2.add(personC);
+    		thanksgiving.setParticipants(participants2);
+    		
+    		activityRepo.save(thanksgiving);
     	
     	}	catch (Exception e) {
     		result.append("ERROR\n");
@@ -207,6 +225,50 @@ public class GeneralServices {
 	    	decoration.setActivity(halloween);
 	    	decoration.setName("Adornos");
 	    	decoration.setAmmount(30);
+	    	decoration.setCalculated(false);
+	    	decoration.setDescription("Decoracion del local");
+	    	decoration.setOwner(personB);
+	    	
+	    	taskRepo.save(drinks);
+	    	taskRepo.save(rent);
+	    	taskRepo.save(transportation);
+	    	taskRepo.save(food);
+	    	taskRepo.save(decoration);
+	    	
+	    	
+	    	drinks = new Task();
+	    	rent = new Task();
+	    	transportation = new Task();
+	    	food = new Task();
+	    	decoration = new Task();
+	    	
+	    	drinks.setActivity(thanksgiving);
+	    	drinks.setName("Bebidas");
+	    	drinks.setAmmount(1100);
+	    	drinks.setCalculated(false);
+	    	drinks.setDescription("Cervezas, ron y refrescos");
+	    	drinks.setOwner(personA);
+	    	rent.setActivity(thanksgiving);
+	    	rent.setName("Renta");
+	    	rent.setAmmount(1080);
+	    	rent.setCalculated(false);
+	    	rent.setDescription("Renta del local");
+	    	rent.setOwner(personB);
+	    	transportation.setActivity(thanksgiving);
+	    	transportation.setName("Taxi");
+	    	transportation.setAmmount(1120);
+	    	transportation.setCalculated(false);
+	    	transportation.setDescription("Alquiler de vehiculos");
+	    	transportation.setOwner(personC);
+	    	food.setActivity(thanksgiving);
+	    	food.setName("Comida");
+	    	food.setAmmount(1150);
+	    	food.setCalculated(false);
+	    	food.setDescription("Elaboracion de tapas");
+	    	food.setOwner(personB);
+	    	decoration.setActivity(thanksgiving);
+	    	decoration.setName("Adornos");
+	    	decoration.setAmmount(1030);
 	    	decoration.setCalculated(false);
 	    	decoration.setDescription("Decoracion del local");
 	    	decoration.setOwner(personB);

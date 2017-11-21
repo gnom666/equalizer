@@ -21,7 +21,6 @@ public class RoleOut {
 	public Error error;
 	
 	public RoleOut(long id, RoleType roleType, List<Long> members, Error error) {
-		super();
 		this.id = id;
 		this.roleType = roleType;
 		this.members = members;
