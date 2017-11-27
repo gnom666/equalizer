@@ -19,6 +19,8 @@ public class PersonOut {
 	public List<Long> tasks;
 	public List<Long> paid;
 	public List<Long> received;
+	public List<Long> contacts;
+	public List<Long> contactOf;
 	public String firstName;
 	public String lastName;
 	public String modified;
@@ -29,7 +31,7 @@ public class PersonOut {
 	public Error error;
 	
 	public PersonOut(long id, List<Long> owns, List<Long> activities, List<Long> tasks, List<Long> paid,
-			List<Long> received, String firstName, String lastName, String modified, String email,
+			List<Long> received, List<Long> contacts, List<Long> contactOf, String firstName, String lastName, String modified, String email,
 			String password, int numpers, boolean enabled, Error error) {
 		this.id = id;
 		this.owns = owns;
@@ -37,6 +39,8 @@ public class PersonOut {
 		this.tasks = tasks;
 		this.paid = paid;
 		this.received = received;
+		this.contacts = contacts;
+		this.contactOf = contactOf;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.modified = modified;
@@ -53,6 +57,8 @@ public class PersonOut {
 		this.tasks = new ArrayList<>();
 		this.paid = new ArrayList<>();
 		this.received = new ArrayList<>();
+		this.contacts = new ArrayList<>();
+		this.contactOf = new ArrayList<>();
 		
 		if (person != null) {
 			person.getOwns().forEach(o->this.owns.add(o.getId()));
@@ -60,6 +66,8 @@ public class PersonOut {
 			person.getTasks().forEach(t->this.tasks.add(t.getId()));
 			person.getPaid().forEach(p->this.paid.add(p.getId()));
 			person.getReceived().forEach(r->this.received.add(r.getId()));
+			person.getContacts().forEach(c->this.contacts.add(c.getId()));
+			person.getContactOf().forEach(c->this.contactOf.add(c.getId()));
 			
 			this.id = person.getId();
 			this.firstName = person.getFirstName();

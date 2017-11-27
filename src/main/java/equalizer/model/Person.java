@@ -5,18 +5,23 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -56,20 +61,39 @@ public class Person {
 	@OneToMany(mappedBy = "to")
 	private List<Payment> received;
 	
-	private String firstName;
-	private String lastName;
-	private String modified;
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
+	@ManyToMany(cascade = CascadeType.ALL,
+				targetEntity = Person.class,
+				fetch = FetchType.LAZY)
+	@JoinTable(	name = "person_person",
+				joinColumns = @JoinColumn(name = "contactOf", referencedColumnName = "id"), 
+				inverseJoinColumns = @JoinColumn(name = "contact", referencedColumnName = "id"))
+	private List<Person> contacts;
 	
+	//@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
+	//@ManyToMany(mappedBy = "contacts")
+	@ManyToMany(cascade = CascadeType.ALL,
+				targetEntity = Person.class,
+				fetch = FetchType.LAZY)
+	@JoinTable(	name = "person_person",
+				joinColumns = @JoinColumn(name = "contact", referencedColumnName = "id"), 
+				inverseJoinColumns = @JoinColumn(name = "contactOf", referencedColumnName = "id"))
+	private List<Person> contactOf;
+	
+	private String firstName;
+
+	private String lastName;
+
+	private String modified;
+
 	@NotNull
     @Min(1)
 	private int numpers;
-	
+
 	@Column(unique = true, nullable = false, length = 45)
 	private String email;
-	
 	@Column(nullable = false)
 	private String password;
-	
 	@Column(nullable = false)
 	private boolean enabled;
 	
@@ -87,12 +111,21 @@ public class Person {
 		this.tasks = new ArrayList<>();
 		this.paid = new ArrayList<>();
 		this.received = new ArrayList<>();
+		this.contacts = new ArrayList<>();
 	}
-
+	
 	public List<Activity> getActivities() {
 		return activities;
 	}
-
+	
+	public List<Person> getContactOf() {
+		return contactOf;
+	}
+	
+	public List<Person> getContacts() {
+		return contacts;
+	}
+	
 	public String getEmail() {
 		return email;
 	}
@@ -112,18 +145,18 @@ public class Person {
 	public String getLastName() {
 		return lastName;
 	}
+
 	public String getModified() {
 		return modified;
 	}
-	
+
 	public int getNumpers() {
 		return numpers;
 	}
-
 	public List<Activity> getOwns() {
 		return owns;
 	}
-
+	
 	public List<Payment> getPaid() {
 		return paid;
 	}
@@ -147,10 +180,18 @@ public class Person {
 	public boolean isEnabled() {
 		return enabled;
 	}
-	
+
 	public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 		updateModified();
+	}
+
+	public void setContactOf(List<Person> contactOf) {
+		this.contactOf = contactOf;
+	}
+	
+	public void setContacts(List<Person> contacts) {
+		this.contacts = contacts;
 	}
 	
 	public void setEmail(String email) {
@@ -213,6 +254,42 @@ public class Person {
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 		updateModified();
+	}
+	
+	public List<Person> addToContacts (Person person) {
+		for (Person p : contacts) {
+			if (p.id == person.id) return contacts;
+		}
+		contacts.add(person);
+		return contacts;
+	}
+	
+	public List<Person> addToContactOf (Person person) {
+		for (Person p : contactOf) {
+			if (p.id == person.id) return contactOf;
+		}
+		contactOf.add(person);
+		return contactOf;
+	}
+	
+	public List<Person> removeFromContacts (Person person) {
+		for (Person p : contacts) {
+			if (p.id == person.id) {
+				contacts.remove(p);
+				return contacts;
+			}
+		}
+		return contacts;
+	}
+	
+	public List<Person> removeFromContactOf (Person person) {
+		for (Person p : contactOf) {
+			if (p.id == person.id) {
+				contactOf.remove(p);
+				return contactOf;
+			}
+		}
+		return contactOf;
 	}
 
 	private void updateModified() {

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
+import equalizer.controlermodel.Error;
 import equalizer.model.Person;
 import equalizer.repository.PersonRepository;
 import equalizer.viewmodel.PersonOut;
@@ -88,6 +89,132 @@ public class PersonServices {
 				new Person()
 				.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
 				.toPublic();
+    }
+	
+	/**
+	 * Gets the list of contacts of a person by its id
+	 * @param id The Id of a person
+	 * @return List<Long>
+	 */
+	@RequestMapping(value="/contactsidsbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<Long> contactsIdsById(@RequestParam(value="pId", defaultValue="0") long id) {
+    	Person person = personRepo.findById(id);
+		if (person != null) {
+			return new PersonOut(person).contacts;
+		}
+		return new ArrayList<>();
+    }
+	
+	/**
+	 * Gets the list of persons with this person as contact
+	 * @param id The Id of a person
+	 * @return List<Long>
+	 */
+	@RequestMapping(value="/contactofidsbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<Long> contactOfIdsById(@RequestParam(value="pId", defaultValue="0") long id) {
+    	Person person = personRepo.findById(id);
+		if (person != null) {
+			return new PersonOut(person).contactOf;
+		}
+		return new ArrayList<>();
+    }
+	
+	/**
+	 * Gets the list of contacts of a person by its id
+	 * @param id The Id of a person
+	 * @return List<PersonOut>
+	 */
+	@RequestMapping(value="/contactsbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PersonOut> contactsById(@RequestParam(value="pId", defaultValue="0") long id) {
+    	List<PersonOut> contacts = new ArrayList<>();		
+		Person person = personRepo.findById(id);
+		if (person != null) {
+			person.getContacts().forEach(p -> contacts.add(new PersonOut(p)));
+		}
+		return contacts;
+    }
+	
+	/**
+	 * Gets the list of persons with this person as contact
+	 * @param id The Id of a person
+	 * @return List<PersonOut>
+	 */
+	@RequestMapping(value="/contactofbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PersonOut> contactOfById(@RequestParam(value="pId", defaultValue="0") long id) {
+		List<PersonOut> contactOf = new ArrayList<>();		
+		Person person = personRepo.findById(id);
+		if (person != null) {
+			person.getContactOf().forEach(p -> contactOf.add(new PersonOut(p)));
+		}
+		return contactOf;
+    }
+	
+	/**
+	 * Sets friends A-->B and B-->A
+	 * @param id1 Person A id
+	 * @param id2 Person B id
+	 * @return List<PersonOut>
+	 */
+	@RequestMapping(value="/setfriends", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PersonOut> setFrinds(@RequestParam(value="person1Id", defaultValue="0") long id1, 
+    								 @RequestParam(value="person2Id", defaultValue="0") long id2) {
+		List<PersonOut> friends = new ArrayList<>();		
+		Person person1 = personRepo.findById(id1);
+		Person person2 = personRepo.findById(id2);
+		Error error = new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person with id not found");
+		
+		if (person1 != null) {
+			friends.add(new PersonOut(person1));
+		}	else {
+			friends.add(new PersonOut(new Person().setError(error)));
+		}
+		if (person2 != null) {
+			friends.add(new PersonOut(person2));
+		}	else {
+			friends.add(new PersonOut(new Person().setError(error)));
+		}
+		if (person1 != null && person2 != null) {
+			person1.addToContacts(person2);
+			person2.addToContacts(person1);
+			personRepo.save(person1);
+			personRepo.save(person2);
+		}
+		return friends;
+    }
+	
+	/**
+	 * Unsets friends A-x>B and B-x>A
+	 * @param id1 Person A id
+	 * @param id2 Person B id
+	 * @return List<PersonOut>
+	 */
+	@RequestMapping(value="/unsetfriends", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PersonOut> unsetFriends(@RequestParam(value="person1Id", defaultValue="0") long id1, 
+    									@RequestParam(value="person2Id", defaultValue="0") long id2) {
+		List<PersonOut> friends = new ArrayList<>();		
+		Person person1 = personRepo.findById(id1);
+		Person person2 = personRepo.findById(id2);
+		Error error = new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person with id not found");
+		
+		if (person1 != null) {
+			friends.add(new PersonOut(person1));
+		}	else {
+			friends.add(new PersonOut(new Person().setError(error)));
+		}
+		if (person2 != null) {
+			friends.add(new PersonOut(person2));
+		}	else {
+			friends.add(new PersonOut(new Person().setError(error)));
+		}
+		if (person1 != null && person2 != null) {
+			person1.removeFromContacts(person2);
+			//person1.removeFromContactOf(person2);
+			person2.removeFromContacts(person1);
+			//person2.removeFromContactOf(person1);
+			personRepo.save(person1);
+			personRepo.save(person2);
+		}
+		return friends;
     }
 	
 	/**

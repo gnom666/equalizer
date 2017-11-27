@@ -158,6 +158,24 @@ public class Activity {
 		this.participants = participants;
 		updateModified();
 	}
+	
+	public List<Person> addParticipant (Person person) {
+		for (Person p : participants) {
+			if (p.getId() == person.getId()) return participants;
+		}
+		participants.add(person);
+		return participants;
+	}
+	
+	public List<Person> removeParticipant (Person person) {
+		for (Person p : participants) {
+			if (p.getId() == person.getId()) {
+				participants.remove(p);
+				return participants;
+			}
+		}
+		return participants;
+	}
 
 	public void setPayments(List<Payment> payments) {
 		this.payments = payments;

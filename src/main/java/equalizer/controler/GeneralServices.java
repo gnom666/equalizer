@@ -54,17 +54,23 @@ public class GeneralServices {
 	 */
 	@RequestMapping(value="/init", method=RequestMethod.GET)
     public String init() {
-    	StringBuffer result = new StringBuffer();
-    	Role roleAdm = new Role();
+    	
+		StringBuffer result = new StringBuffer();
+    	
+		Role roleAdm = new Role();
     	Role roleAUser = new Role();
     	Role roleCUser = new Role();
     	Role roleGuest = new Role();
+    	
     	Person personA = new Person();
     	Person personB = new Person();
     	Person personC = new Person();
     	Person personD = new Person();
+    	Person personE = new Person();
+    	
     	Activity halloween = new Activity();
     	Activity thanksgiving = new Activity();
+    	
     	Task drinks = new Task();
     	Task rent = new Task();
     	Task transportation = new Task();
@@ -103,6 +109,7 @@ public class GeneralServices {
 	    	personA.setNumpers(1);
 	    	personA.setRole(roleAdm);
 	    	personA.setEnabled(true);
+	    	
 	    	personB.setFirstName("B.");
 	    	personB.setLastName("Beluga");
 	    	personB.setPassword("bpass");
@@ -110,6 +117,7 @@ public class GeneralServices {
 	    	personB.setNumpers(2);
 	    	personB.setRole(roleCUser);
 	    	personB.setEnabled(true);
+	    	
 	    	personC.setFirstName("C.");
 	    	personC.setLastName("Castor");
 	    	personC.setPassword("cpass");
@@ -117,18 +125,63 @@ public class GeneralServices {
 	    	personC.setNumpers(2);
 	    	personC.setRole(roleCUser);
 	    	personC.setEnabled(true);
+	    	
 	    	personD.setFirstName("D.");
 	    	personD.setLastName("Dodo");
 	    	personD.setPassword("dpass");
 	    	personD.setEmail("d@eq.com");
 	    	personD.setNumpers(3);
-	    	personD.setRole(roleGuest);
+	    	personD.setRole(roleCUser);
 	    	personD.setEnabled(true);
-	    	  	
+	    	
+	    	personE.setFirstName("E.");
+	    	personE.setLastName("Erizo");
+	    	personE.setPassword("epass");
+	    	personE.setEmail("e@eq.com");
+	    	personE.setNumpers(1);
+	    	personE.setRole(roleGuest);
+	    	personE.setEnabled(true);
+	    	
 	    	personRepo.save(personA);
 	    	personRepo.save(personB);
 	    	personRepo.save(personC);
 	    	personRepo.save(personD);
+	    	personRepo.save(personE);
+	    	
+	    	ArrayList<Person> contacts = new ArrayList<>();
+	    	contacts.add(personB);
+	    	contacts.add(personC);
+	    	contacts.add(personD);
+	    	contacts.add(personE);
+	    	personA.setContacts(contacts);
+	    	
+	    	contacts = new ArrayList<>();
+	    	contacts.add(personA);
+	    	contacts.add(personC);
+	    	contacts.add(personD);
+	    	personB.setContacts(contacts);
+	    	
+	    	contacts = new ArrayList<>();
+	    	contacts.add(personA);
+	    	contacts.add(personB);
+	    	contacts.add(personD);
+	    	personC.setContacts(contacts);
+	    	
+	    	contacts = new ArrayList<>();
+	    	contacts.add(personB);
+	    	contacts.add(personC);
+	    	contacts.add(personA);
+	    	personD.setContacts(contacts);
+	    	
+	    	contacts = new ArrayList<>();
+	    	contacts.add(personA);
+	    	personE.setContacts(contacts);
+	    	
+	    	personRepo.save(personA);
+	    	personRepo.save(personB);
+	    	personRepo.save(personC);
+	    	personRepo.save(personD);
+	    	personRepo.save(personE);
 	    	
     	}	catch (Exception e) {
     		result.append("ERROR\n");

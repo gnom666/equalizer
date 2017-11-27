@@ -1,9 +1,16 @@
 package equalizer.controler;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
+import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
 import equalizer.model.Person;
 import equalizer.repository.ActivityRepository;
@@ -65,6 +73,48 @@ public class ActivitiesServices {
     }
 	
 	/**
+	 * Add a new Activity
+	 * @param act The Activity
+	 * @return String
+	 */
+	@RequestMapping(value="/addactivity", method=RequestMethod.POST)
+    public String addActivity(@RequestBody ActivityOut act) {
+    	Activity activity = new Activity();
+    	String result = "ok";
+    	Error error = null;
+    	
+    	System.out.println(act.toString());
+		
+    	Person owner = personRepo.findById(act.owner);
+    	if (owner == null) {
+    		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner).toString();
+    	}
+    	activity.setOwner(owner);
+		activity.setName(act.name);
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		try {
+			activity.setDate(format.parse(act.date));
+		} 	catch (ParseException e) {
+			e.printStackTrace();
+			return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage()).toString();
+		}
+		
+		activityRepo.save(activity);
+		
+		activity.setDescription(act.description);
+		act.participants.forEach(pId -> {
+			Person participant = personRepo.findById(pId);
+			if (participant != null) {
+				activity.addParticipant(participant);
+			}
+		});
+		
+		activityRepo.save(activity);
+		
+		return "OK";
+    }
+	
+	/**
 	 * Lists all activities which a person has participated in
 	 * @param personId The Id of the person
 	 * @return List of ActivityOut
@@ -90,6 +140,96 @@ public class ActivitiesServices {
 		}		
 
 		return result;
+    }
+	
+	/**
+	 * Adds a new paticipant to an activity
+	 * @param activityId The Id of the activity
+	 * @param personId The Id of the person
+	 * @return ActivityOut
+	 */
+	@RequestMapping(value="/addparticipant", method=RequestMethod.GET)
+    public ActivityOut addParticipant(@RequestParam(value="aId", defaultValue="0") long activityId,
+    								  @RequestParam(value="pId", defaultValue="0") long personId) {
+    	
+		Activity activity = activityRepo.findById(activityId);
+		if (activity != null) {
+			Person person = personRepo.findById(personId);
+			if (person != null) {
+				activity.addParticipant(person);
+				activityRepo.save(activity);
+				return new ActivityOut(activity);
+			}	else {
+				new ActivityOut(
+						activity.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")));
+			}
+		}	else {
+			return new ActivityOut(
+					new Activity()
+					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found")));
+		}	
+
+		return new ActivityOut(activity);
+    }
+	
+	/**
+	 * Removes a paticipant from an activity
+	 * @param activityId The Id of the activity
+	 * @param personId The Id of the person
+	 * @return ActivityOut
+	 */
+	@RequestMapping(value="/removeparticipant", method=RequestMethod.GET)
+    public ActivityOut removeParticipant(@RequestParam(value="aId", defaultValue="0") long activityId,
+    									 @RequestParam(value="pId", defaultValue="0") long personId) {
+    	
+		Activity activity = activityRepo.findById(activityId);
+		if (activity != null) {
+			Person person = personRepo.findById(personId);
+			if (person != null) {
+				activity.removeParticipant(person);
+				activityRepo.save(activity);
+				return new ActivityOut(activity);
+			}	else {
+				new ActivityOut(
+						activity.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")));
+			}
+		}	else {
+			return new ActivityOut(
+					new Activity()
+					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found")));
+		}	
+
+		return new ActivityOut(activity);
+    }
+	
+	/**
+	 * Removes all paticipants from an activity
+	 * @param activityId The Id of the activity
+	 * @return ActivityOut
+	 */
+	@RequestMapping(value="/removeallparticipants", method=RequestMethod.GET)
+    public ActivityOut removeAllParticipants(@RequestParam(value="aId", defaultValue="0") long activityId) {
+    	
+		Activity activity = activityRepo.findById(activityId);
+		
+		if (activity != null) {
+			for (Person person : activity.getParticipants()) {
+				if (person != null) {
+					activity.removeParticipant(person);
+					activityRepo.save(activity);
+					return new ActivityOut(activity);
+				}	else {
+					new ActivityOut(
+							activity.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")));
+				}
+			}
+		}	else {
+			return new ActivityOut(
+					new Activity()
+					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found")));
+		}	
+
+		return new ActivityOut(activity);
     }
 	
 	/**

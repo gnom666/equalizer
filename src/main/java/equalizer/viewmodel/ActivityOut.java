@@ -23,9 +23,15 @@ public class ActivityOut {
 	public String modified;
 	public String date;
 	public String description;
-	public boolean calculated;
+	public boolean calculated = false;
 	public double total = 0.0;
 	public Error error;
+	
+	public ActivityOut() {
+		participants = new ArrayList<>();
+		tasks = new ArrayList<>();
+		payments = new ArrayList<>();
+	}
 	
 	public ActivityOut(long id, long owner, List<Long> participants, List<Long> tasks, List<Long> payments, String name,
 			String modified, String date, String description, boolean calculated, double total, Error error) {
@@ -65,5 +71,12 @@ public class ActivityOut {
 			this.error = activity.getError();
 		}
 	}
-		
+
+	@Override
+	public String toString() {
+		return "ActivityOut [id=" + id + ", owner=" + owner + ", participants=" + participants + ", tasks=" + tasks
+				+ ", payments=" + payments + ", name=" + name + ", modified=" + modified + ", date=" + date
+				+ ", description=" + description + ", calculated=" + calculated + ", total=" + total + ", error="
+				+ error + "]";
+	}		
 }
