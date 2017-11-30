@@ -89,8 +89,11 @@ public class ActivitiesServices {
     	if (owner == null) {
     		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner).toString();
     	}
+    	
     	activity.setOwner(owner);
 		activity.setName(act.name);
+		activity.setDescription(act.description);
+		
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 		try {
 			activity.setDate(format.parse(act.date));
@@ -101,7 +104,51 @@ public class ActivitiesServices {
 		
 		activityRepo.save(activity);
 		
+		act.participants.forEach(pId -> {
+			Person participant = personRepo.findById(pId);
+			if (participant != null) {
+				activity.addParticipant(participant);
+			}
+		});
+		
+		activityRepo.save(activity);
+		
+		return "OK";
+    }
+	
+	/**
+	 * Modify Activity
+	 * @param act The Activity
+	 * @return String
+	 */
+	@RequestMapping(value="/modifyactivity", method=RequestMethod.POST)
+    public String modifyActivity(@RequestBody ActivityOut act) {
+    	String result = "ok";
+    	Error error = null;
+    	
+    	Activity activity = activityRepo.findById(act.id);
+    	if (activity == null) {
+    		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Unknown activity " + act.id).toString();
+    	}
+    	
+    	Person owner = personRepo.findById(act.owner);
+    	if (owner == null) {
+    		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner).toString();
+    	}
+    	
+    	activity.setOwner(owner);
+		activity.setName(act.name);
 		activity.setDescription(act.description);
+		
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+		try {
+			activity.setDate(format.parse(act.date));
+		} 	catch (ParseException e) {
+			e.printStackTrace();
+			return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage()).toString();
+		}
+		
+		activity.getParticipants().clear();		
 		act.participants.forEach(pId -> {
 			Person participant = personRepo.findById(pId);
 			if (participant != null) {

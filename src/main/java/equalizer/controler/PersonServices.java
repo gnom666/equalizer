@@ -16,7 +16,9 @@ import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
 import equalizer.controlermodel.Error;
+import equalizer.model.Activity;
 import equalizer.model.Person;
+import equalizer.repository.ActivityRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.viewmodel.PersonOut;
 
@@ -31,6 +33,9 @@ public class PersonServices {
 
 	@Autowired
 	private PersonRepository personRepo;
+	
+	@Autowired
+	private ActivityRepository activityRepo;
 
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -89,6 +94,18 @@ public class PersonServices {
 				new Person()
 				.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
 				.toPublic();
+    }
+	
+	@RequestMapping(value="/participantsbyact", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PersonOut> participantsByActivity(@RequestParam(value="aId", defaultValue="0") long id) {
+    	ArrayList<PersonOut> participants = new ArrayList<>();
+		Activity activity = activityRepo.findById(id);
+    	if (activity != null) {
+    		activity.getParticipants().forEach(p -> {
+    			participants.add(new PersonOut(p));
+    		});
+    	}
+    	return participants;
     }
 	
 	/**
