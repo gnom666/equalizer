@@ -53,8 +53,8 @@ public class PaymentsServices {
 	
 	/**
 	 * Truncates a value to two decimals
-	 * @param val
-	 * @return
+	 * @param val Value to truncate
+	 * @return double
 	 */
 	public double trunc2decimals (double val) {
 		double result = val*100;
@@ -65,8 +65,8 @@ public class PaymentsServices {
 	
 	/**
 	 * Rounds a value to two decimals
-	 * @param val
-	 * @return
+	 * @param val Value to round
+	 * @return double
 	 */
 	public double round2decimals (double val) {
 		double result = val*100;
@@ -332,7 +332,7 @@ public class PaymentsServices {
 	
 	/**
 	 * Lists all the payments to a person
-	 * @param fromId The Id of the person
+	 * @param toId The Id of the person
 	 * @return List of PaymentOut
 	 */
 	@RequestMapping(value="/paymentsbyto", method=RequestMethod.GET)

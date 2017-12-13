@@ -112,6 +112,7 @@ public class Person {
 		this.paid = new ArrayList<>();
 		this.received = new ArrayList<>();
 		this.contacts = new ArrayList<>();
+		this.contactOf = new ArrayList<>();
 	}
 	
 	public List<Activity> getActivities() {

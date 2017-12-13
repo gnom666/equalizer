@@ -1,12 +1,17 @@
 package equalizer.controler;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,11 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
+import equalizer.controlermodel.Constants.RoleType;
 import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
 import equalizer.model.Person;
+import equalizer.model.Role;
 import equalizer.repository.ActivityRepository;
+import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
+import equalizer.repository.RoleRepository;
+import equalizer.viewmodel.ActivityOut;
 import equalizer.viewmodel.PersonOut;
 
 /**
@@ -36,6 +46,12 @@ public class PersonServices {
 	
 	@Autowired
 	private ActivityRepository activityRepo;
+	
+	@Autowired
+	private RoleRepository roleRepo;
+	
+	@Autowired
+	private PaymentsRepository paymentsRepo;
 
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -279,7 +295,7 @@ public class PersonServices {
 	
 	/**
 	 * Checks a person's password given it's username (ie email)
-	 * @param userId The username of the person
+	 * @param username The username of the person
 	 * @param password The corresponding password
 	 * @return PersonOut 
 	 */
@@ -289,7 +305,14 @@ public class PersonServices {
     	Person person = personRepo.findByEmail(username);
 		if (person != null) {
 			if (person.getPassword().equals(password)) {
-				return new PersonOut(person).toPublic();
+				if (person.isEnabled()) {
+					return new PersonOut(person).toPublic();
+				}	else {
+					return new PersonOut(
+							new Person()
+							.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_DISABLED, "Person not enabled")))
+							.toPublic();
+				}
 			}	else {
 				return new PersonOut(
 						new Person()
@@ -301,5 +324,82 @@ public class PersonServices {
 				new Person()
 				.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
 				.toPublic();
+    }
+	
+	/**
+	 * Add a new Person
+	 * @param p The Person
+	 * @return PersonOut
+	 */
+	@RequestMapping(value="/addperson", method=RequestMethod.POST)
+    public PersonOut addPerson(@RequestBody PersonOut p) {
+		
+		Person person = personRepo.findByEmail(p.email);
+		System.out.println(p.toString());
+		
+		if (person != null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.EXISTENT_DATA, "Existent email " + p.email)))
+					.toPublic();
+		}
+		
+		person = new Person();
+		person.setEmail(p.email);
+		person.setFirstName(p.firstName);
+		person.setLastName(p.lastName);
+		person.setNumpers(p.numpers);
+		person.setPassword(p.password);
+		person.setEnabled(true);
+		
+		List<Role> roles = roleRepo.findByRoleType(RoleType.COMMON_USER);
+		if(roles == null || roles.size() < 1) {
+			Role role = new Role();
+			role.setRoleType(RoleType.COMMON_USER);
+			roleRepo.save(role);
+			person.setRole(role);
+		}	else {
+			person.setRole(roles.get(0));
+		}
+		
+		personRepo.save(person);
+		
+		return new PersonOut(person).toPublic();
+    }
+	
+	/**
+	 * Modify a Person
+	 * @param p The Person
+	 * @return PersonOut
+	 */
+	@RequestMapping(value="/modifyperson", method=RequestMethod.POST)
+    public PersonOut modifyPerson(@RequestBody PersonOut p) {
+		
+		Person person = personRepo.findById(p.id);
+		System.out.println(p.toString());
+		
+		if (person == null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
+					.toPublic();
+		}
+		
+		person.setEmail(p.email);
+		person.setFirstName(p.firstName);
+		person.setLastName(p.lastName);
+		person.setPassword(p.password);
+		if (person.getNumpers() != p.numpers) {
+			person.setNumpers(p.numpers);
+			person.getActivities().forEach(a -> {
+				paymentsRepo.removeByActivity(a);
+				a.setCalculated(false);
+				a.getTasks().forEach(t -> t.setCalculated(false));
+			});
+		}
+				
+		personRepo.save(person);
+		
+		return new PersonOut(person).toPublic();
     }
 }

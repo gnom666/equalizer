@@ -78,7 +78,7 @@ public class ActivitiesServices {
 	 * @return String
 	 */
 	@RequestMapping(value="/addactivity", method=RequestMethod.POST)
-    public String addActivity(@RequestBody ActivityOut act) {
+    public ActivityOut addActivity(@RequestBody ActivityOut act) {
     	Activity activity = new Activity();
     	String result = "ok";
     	Error error = null;
@@ -87,7 +87,9 @@ public class ActivitiesServices {
 		
     	Person owner = personRepo.findById(act.owner);
     	if (owner == null) {
-    		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner).toString();
+    		return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner)));
     	}
     	
     	activity.setOwner(owner);
@@ -99,7 +101,9 @@ public class ActivitiesServices {
 			activity.setDate(format.parse(act.date));
 		} 	catch (ParseException e) {
 			e.printStackTrace();
-			return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage()).toString();
+			return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage())));
 		}
 		
 		activityRepo.save(activity);
@@ -113,7 +117,7 @@ public class ActivitiesServices {
 		
 		activityRepo.save(activity);
 		
-		return "OK";
+		return new ActivityOut(activity);
     }
 	
 	/**
@@ -122,18 +126,21 @@ public class ActivitiesServices {
 	 * @return String
 	 */
 	@RequestMapping(value="/modifyactivity", method=RequestMethod.POST)
-    public String modifyActivity(@RequestBody ActivityOut act) {
-    	String result = "ok";
+    public ActivityOut modifyActivity(@RequestBody ActivityOut act) {
     	Error error = null;
     	
     	Activity activity = activityRepo.findById(act.id);
     	if (activity == null) {
-    		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Unknown activity " + act.id).toString();
+    		return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Unknown activity " + act.id)));
     	}
     	
     	Person owner = personRepo.findById(act.owner);
     	if (owner == null) {
-    		return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner).toString();
+    		return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner)));
     	}
     	
     	activity.setOwner(owner);
@@ -145,7 +152,9 @@ public class ActivitiesServices {
 			activity.setDate(format.parse(act.date));
 		} 	catch (ParseException e) {
 			e.printStackTrace();
-			return new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage()).toString();
+			return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage())));
 		}
 		
 		activity.getParticipants().clear();		
@@ -158,7 +167,7 @@ public class ActivitiesServices {
 		
 		activityRepo.save(activity);
 		
-		return "OK";
+		return new ActivityOut(activity);
     }
 	
 	/**
@@ -204,6 +213,7 @@ public class ActivitiesServices {
 			Person person = personRepo.findById(personId);
 			if (person != null) {
 				activity.addParticipant(person);
+				activity.setCalculated(false);
 				activityRepo.save(activity);
 				return new ActivityOut(activity);
 			}	else {

@@ -44,7 +44,9 @@ public final class Constants {
 		PAYMENT_CLOSED,
 		ZERO_PERSONS,
 		INCORRECT_PASSWORD,
-		BAD_DATE_FORMAT
+		BAD_DATE_FORMAT,
+		EXISTENT_DATA,
+		PERSON_DISABLED
 	}
 	
 	public static String errorTypeName (ErrorType type) {
@@ -83,6 +85,12 @@ public final class Constants {
 			break;
 		case BAD_DATE_FORMAT:
 			typeName = "BAD_DATE_FORMAT";
+			break;
+		case EXISTENT_DATA:
+			typeName = "EXISTENT_DATA";
+			break;
+		case PERSON_DISABLED:
+			typeName = "PERSON_DISABLED";
 			break;
 		default:
 			typeName = "UNKNOWN";
