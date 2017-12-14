@@ -30,6 +30,16 @@ public class PersonOut {
 	public boolean enabled;
 	public Error error;
 	
+	public PersonOut () {
+		owns = new ArrayList<>();
+		activities = new ArrayList<>();
+		tasks = new ArrayList<>();
+		paid = new ArrayList<>();
+		received = new ArrayList<>();
+		contacts = new ArrayList<>();
+		contactOf = new ArrayList<>();
+	}
+	
 	public PersonOut(long id, List<Long> owns, List<Long> activities, List<Long> tasks, List<Long> paid,
 			List<Long> received, List<Long> contacts, List<Long> contactOf, String firstName, String lastName, String modified, String email,
 			String password, int numpers, boolean enabled, Error error) {

@@ -1,21 +1,28 @@
 package equalizer.controler;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import equalizer.config.EqualizerConfiguration;
+import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
 import equalizer.model.Activity;
 import equalizer.model.Person;
 import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
+import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.ActivityOut;
@@ -38,6 +45,9 @@ public class TasksServices {
 	
 	@Autowired
 	private PersonRepository personRepo;
+	
+	@Autowired
+	private PaymentsRepository paymentsRepo;
 
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -113,5 +123,75 @@ public class TasksServices {
 		}
 		
 		return result;
+    }
+	
+	/**
+	 * Add a new Task
+	 * @param tsk The Task
+	 * @return TaskOut
+	 */
+	@RequestMapping(value="/addtask", method=RequestMethod.POST)
+    public TaskOut addTask(@RequestBody TaskOut tsk) {
+		
+		Task task = new Task();
+    	
+    	Person owner = personRepo.findById(tsk.owner);
+    	if (owner == null) {
+    		return new TaskOut(
+    				new Task()
+    				.setError(new Error(ErrorCode.TASKS_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + tsk.owner)));
+    	}
+    	
+    	Activity activity = activityRepo.findById(tsk.activity);
+    	if (activity == null) {
+    		return new TaskOut(
+    				new Task()
+    				.setError(new Error(ErrorCode.TASKS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Unknown activity " + tsk.activity)));
+    	}
+    	
+    	task.setActivity(activity);
+    	task.setOwner(owner);
+    	task.setName(tsk.name);
+    	task.setDescription(tsk.description);
+    	task.setAmmount(tsk.ammount);
+    	task.setCalculated(false);
+    	
+    	taskRepo.save(task);
+		
+		return new TaskOut(task);
+    }
+	
+	/**
+	 * Modify Task
+	 * @param tsk The Task
+	 * @return TaskOut
+	 */
+	@RequestMapping(value="/modifytask", method=RequestMethod.POST)
+    public TaskOut modifyTask(@RequestBody TaskOut tsk) {
+		
+		Task task = taskRepo.findById(tsk.id);
+		if (task == null) {
+			return new TaskOut(
+    				new Task()
+    				.setError(new Error(ErrorCode.TASKS_SERVICES, ErrorType.TASK_NOT_FOUND, "Unknown task " + tsk.id)));
+		}		
+    	
+    	task.setName(tsk.name);
+    	task.setDescription(tsk.description);
+    	if (tsk.ammount != task.getAmmount()) {
+	    	task.setAmmount(tsk.ammount);
+	    	task.setCalculated(false);
+	    	paymentsRepo.removeByActivity(task.getActivity());
+	    	task.getActivity().setCalculated(false);
+	    	
+	    	activityRepo.save(task.getActivity());
+	    	
+    	}	else {
+    		task.setCalculated(tsk.calculated);
+    	}
+    	
+    	taskRepo.save(task);
+		
+		return new TaskOut(task);
     }
 }

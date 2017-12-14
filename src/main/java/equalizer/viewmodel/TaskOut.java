@@ -20,6 +20,10 @@ public class TaskOut {
 	public double ammount;
 	public Error error;
 	
+	public TaskOut () {
+		error = null;
+	}
+	
 	public TaskOut(long id, long owner, long activity, String name, String modified, String description, 
 			boolean calculated,	double ammount, Error error) {
 		this.id = id;

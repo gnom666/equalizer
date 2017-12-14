@@ -20,6 +20,8 @@ public interface TaskRepository extends PagingAndSortingRepository<Task, Long> {
 	
 	List<Task> findByOwner(@Param("owner") Person owner);
 	
+	Task findById(@Param("id") long id);
+	
 	List<Task> findByActivityAndOwner (@Param("activity") Activity activity, @Param("owner") Person owner);
 
 	@Query(value="SELECT * FROM Task WHERE Task.activity_id=:ida AND Task.owner_id=:idp", nativeQuery=true)

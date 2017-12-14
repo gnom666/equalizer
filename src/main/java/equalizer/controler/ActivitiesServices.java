@@ -22,8 +22,10 @@ import equalizer.controlermodel.Constants.ErrorType;
 import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
 import equalizer.model.Person;
+import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PersonRepository;
+import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.ActivityOut;
 
 /**
@@ -40,6 +42,9 @@ public class ActivitiesServices {
 	
 	@Autowired
 	private PersonRepository personRepo;
+	
+	@Autowired
+	private TaskRepository taskRepo;
 	
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -75,16 +80,12 @@ public class ActivitiesServices {
 	/**
 	 * Add a new Activity
 	 * @param act The Activity
-	 * @return String
+	 * @return ActivityOut
 	 */
 	@RequestMapping(value="/addactivity", method=RequestMethod.POST)
     public ActivityOut addActivity(@RequestBody ActivityOut act) {
     	Activity activity = new Activity();
-    	String result = "ok";
-    	Error error = null;
     	
-    	System.out.println(act.toString());
-		
     	Person owner = personRepo.findById(act.owner);
     	if (owner == null) {
     		return new ActivityOut(
@@ -123,7 +124,7 @@ public class ActivitiesServices {
 	/**
 	 * Modify Activity
 	 * @param act The Activity
-	 * @return String
+	 * @return ActivityOut
 	 */
 	@RequestMapping(value="/modifyactivity", method=RequestMethod.POST)
     public ActivityOut modifyActivity(@RequestBody ActivityOut act) {
@@ -136,15 +137,7 @@ public class ActivitiesServices {
     				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Unknown activity " + act.id)));
     	}
     	
-    	Person owner = personRepo.findById(act.owner);
-    	if (owner == null) {
-    		return new ActivityOut(
-    				new Activity()
-    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner)));
-    	}
-    	
-    	activity.setOwner(owner);
-		activity.setName(act.name);
+    	activity.setName(act.name);
 		activity.setDescription(act.description);
 		
 		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
@@ -157,7 +150,16 @@ public class ActivitiesServices {
     				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage())));
 		}
 		
+		List<Person> untouchables = new ArrayList<>();
+		activity.getParticipants().forEach(p -> {
+			List<Task> ptasks = taskRepo.findByActivityAndOwner(activity, p);
+			if (ptasks != null && ptasks.size() > 0) {
+				untouchables.add(p);
+			}
+		});
+		
 		activity.getParticipants().clear();		
+		untouchables.forEach(p -> activity.addParticipant(p));
 		act.participants.forEach(pId -> {
 			Person participant = personRepo.findById(pId);
 			if (participant != null) {
