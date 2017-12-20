@@ -23,6 +23,7 @@
 /home/jorgerios/git/equalizer/src/main/java/equalizer/repository/PersonRepository.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/controler/TasksServices.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Payment.java
+/home/jorgerios/git/equalizer/src/main/java/equalizer/controler/CustomErrorController.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/config/EqualizerConfiguration.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/repository/PaymentsRepository.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/controler/GeneralServices.java

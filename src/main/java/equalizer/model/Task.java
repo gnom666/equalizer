@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PreRemove;
 import javax.persistence.Transient;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -57,6 +58,12 @@ public class Task {
 		this.activity = new Activity();
 	}
 
+	@PreRemove
+	public void preRemove () {
+		owner.getOwns().remove(this);
+		activity.getTasks().remove(this);
+	}
+	
 	public Activity getActivity() {
 		return activity;
 	}

@@ -2,6 +2,8 @@ package equalizer.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
@@ -19,6 +21,9 @@ public interface ActivityRepository extends PagingAndSortingRepository<Activity,
 	List<Activity> findByNameContaining(@Param("name") String name);
 	
 	Activity findById(@Param("id") long id);
+	
+	@Transactional
+	Activity removeById(@Param("id") long id);
 	
 	List<Activity> findByOwner(@Param("owner") Person owner);
 	

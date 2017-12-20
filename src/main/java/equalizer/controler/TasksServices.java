@@ -194,4 +194,26 @@ public class TasksServices {
 		
 		return new TaskOut(task);
     }
+	
+	/**
+	 * Delete a Task
+	 * @param taskId The Id of the task
+	 * @return TaskOut
+	 */
+	@RequestMapping(value="/deletetask", method=RequestMethod.GET)
+    public TaskOut deleteTask (@RequestParam(value="tId", defaultValue="0") long taskId) {
+    	
+		Task task = taskRepo.findById(taskId);
+		if (task == null) {
+			return new TaskOut(
+					new Task()
+					.setError(eConf.lastError().updateError(ErrorCode.TASKS_SERVICES, ErrorType.TASK_NOT_FOUND, "Task not found")));
+		}
+		
+		taskRepo.delete(task);
+		
+		return new TaskOut(task);
+    }
+	
+	
 }

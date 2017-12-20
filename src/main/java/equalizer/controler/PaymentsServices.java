@@ -26,6 +26,7 @@ import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.PaymentOut;
+import equalizer.viewmodel.TaskOut;
 
 /**
  * Payment Services
@@ -500,5 +501,25 @@ public class PaymentsServices {
 	@RequestMapping(value="/lasterror", method=RequestMethod.GET)
     public Error getLastError() {
 		return eConf.lastError();
+    }
+	
+	/**
+	 * Delete a Payment
+	 * @param paymentId The Id of the payment
+	 * @return PaymentOut
+	 */
+	@RequestMapping(value="/deletepayment", method=RequestMethod.GET)
+    public PaymentOut deletePayment(@RequestParam(value="tId", defaultValue="0") long paymentId) {
+    	
+		Payment payment = paymentsRepo.findById(paymentId);
+		if (payment == null) {
+			return new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.PAYMENT_NOT_FOUND, "Payment not found")));
+		}
+		
+		paymentsRepo.delete(payment);
+		
+		return new PaymentOut(payment);
     }
 }

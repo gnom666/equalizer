@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.PreRemove;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -55,6 +56,13 @@ public class Payment {
 		this.from = new Person();
 		this.to = new Person();
 		this.activity = new Activity();
+	}
+	
+	@PreRemove
+	public void preRemove () {
+		from.getPaid().remove(this);
+		to.getReceived().remove(this);
+		activity.getPayments().remove(this);		
 	}
 
 	public Activity getActivity() {

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -40,11 +42,13 @@ public class Activity {
     @JoinColumn(name="owner_id")
     private Person owner;
 	
-	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
+	/*@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(	name = "person_activity", 
 				joinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"), 
-				inverseJoinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"))
+				inverseJoinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"))*/
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Person.class)
+	@ManyToMany(mappedBy = "activities", fetch = FetchType.EAGER)
 	private List<Person> participants;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Task.class)
@@ -72,6 +76,13 @@ public class Activity {
 		this.tasks = new ArrayList<>();
 		this.payments = new ArrayList<>();
 		this.owner = new Person();
+		this.date = new Date();
+	}
+	
+	@PreRemove
+	public void preRemove () {
+		owner.getOwns().remove(this);
+		participants.forEach(p -> p.getActivities().remove(this));
 	}
 
 	public Date getDate() {
@@ -175,6 +186,10 @@ public class Activity {
 			}
 		}
 		return participants;
+	}
+	
+	public void removeParticipants () {
+		participants.clear();
 	}
 
 	public void setPayments(List<Payment> payments) {

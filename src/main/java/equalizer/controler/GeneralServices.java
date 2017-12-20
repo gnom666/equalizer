@@ -1,5 +1,9 @@
 package equalizer.controler;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,6 +11,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import equalizer.config.EqualizerConfiguration;
@@ -20,6 +25,7 @@ import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.RoleRepository;
 import equalizer.repository.TaskRepository;
+import equalizer.viewmodel.PersonOut;
 
 /**
  * General Services
@@ -223,7 +229,7 @@ public class GeneralServices {
     	try {
     		result.append("Alta de participantes de prueba...");
     		
-    		List<Person> participants = new ArrayList<>();
+    		/*List<Person> participants = new ArrayList<>();
     		participants.add(personA);
     		participants.add(personB);
     		participants.add(personC);
@@ -238,7 +244,21 @@ public class GeneralServices {
     		participants2.add(personC);
     		thanksgiving.setParticipants(participants2);
     		
-    		activityRepo.save(thanksgiving);
+    		activityRepo.save(thanksgiving);*/
+    		
+    		personA.getActivities().add(halloween);
+    		personB.getActivities().add(halloween);
+    		personC.getActivities().add(halloween);
+    		personD.getActivities().add(halloween);
+    		
+    		personA.getActivities().add(thanksgiving);
+    		personB.getActivities().add(thanksgiving);
+    		personC.getActivities().add(thanksgiving);
+    		
+    		personRepo.save(personA);
+    		personRepo.save(personB);
+    		personRepo.save(personC);
+    		personRepo.save(personD);
     	
     	}	catch (Exception e) {
     		result.append("ERROR\n");
@@ -341,6 +361,77 @@ public class GeneralServices {
     	
     	
 		return result.toString();
+    }
+	
+	private int commute (int x) {
+		return x + x * (-2) + 1;
+	}  
+	
+	private String bufferToStr (List<Character> buffer) {
+		StringBuilder sb = new StringBuilder();
+		buffer.forEach(c -> sb.append(c));
+		return sb.toString();
+	}
+	
+	/**
+	 * Returns the tail of the out.log file
+	 * @return Log String
+	 */
+	@RequestMapping(value="/logtail", method=RequestMethod.GET)
+    public String getLogTail(@RequestParam(value="log", defaultValue="out.log") String logName,
+    		@RequestParam(value="size", defaultValue="100") int bufferSize) {
+		String result = "";
+		
+		int size = bufferSize * 1024;
+		if (bufferSize % 2 != 0) size++;
+		int limit = size / 2;
+		ArrayList<Character> buffer = new ArrayList<>(size);
+		for (int j = 0; j < size; j++) {
+			buffer.add(' ');
+		}
+		
+		int switcher = 0;
+		int i = 0;
+		
+		File file = new File(logName);
+	    if (!file.exists()) {
+	    	return (logName + " does not exist.");
+	    }
+	    if (!(file.isFile() && file.canRead())) {
+	    	return (logName + " cannot be read from.");
+	    }
+	    try {
+		    FileInputStream fis = new FileInputStream(file);
+		    char current;
+		    while (fis.available() > 0) {
+		    	current = (char) fis.read();
+		    	int pos = switcher * limit + i;
+		    	buffer.set(pos, current);
+		    	
+		    	i++;
+		    	if (i == limit) {
+		    		i = 0;
+		    		switcher = commute(switcher);
+		    	}
+		    }
+	    } 	catch (IOException e) {
+	    	return e.getMessage();
+	    }
+		
+	    int commuted = commute(switcher);
+	    result = bufferToStr(buffer.subList(commuted * limit + i, commuted * limit + limit)) +
+	    		bufferToStr(buffer.subList(switcher * limit, switcher * limit + i));
+		
+		return result;
+	}
+	
+	/**
+	 * Connection Test
+	 * @return String PONG
+	 */
+	@RequestMapping(value="/ping", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public String ping() {
+		return "PONG";
     }
 	
 }

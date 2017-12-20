@@ -25,12 +25,14 @@ import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
 import equalizer.model.Person;
 import equalizer.model.Role;
+import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.RoleRepository;
 import equalizer.viewmodel.ActivityOut;
 import equalizer.viewmodel.PersonOut;
+import equalizer.viewmodel.TaskOut;
 
 /**
  * Person Services
@@ -189,7 +191,7 @@ public class PersonServices {
 	 * @return List<PersonOut>
 	 */
 	@RequestMapping(value="/setfriends", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
-    public List<PersonOut> setFrinds(@RequestParam(value="person1Id", defaultValue="0") long id1, 
+    public List<PersonOut> setFriends(@RequestParam(value="person1Id", defaultValue="0") long id1, 
     								 @RequestParam(value="person2Id", defaultValue="0") long id2) {
 		List<PersonOut> friends = new ArrayList<>();		
 		Person person1 = personRepo.findById(id1);
@@ -213,6 +215,39 @@ public class PersonServices {
 			personRepo.save(person2);
 		}
 		return friends;
+    }
+	
+	/**
+	 * Sets friends A-->B and B-->A
+	 * @param id1 Person A id
+	 * @param id2 Person B id
+	 * @return List<PersonOut>
+	 */
+	@RequestMapping(value="/setfriendbyemail", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public PersonOut setFriendByEmail(@RequestParam(value="pId", defaultValue="0") long id, 
+    								 @RequestParam(value="email", defaultValue="") String email) {
+		Person person1 = personRepo.findById(id);
+		Person person2 = personRepo.findByEmail(email);
+		
+		if (person1 == null) {
+			return new PersonOut(
+					new Person()
+					.setError(
+							new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Main person not found")));
+		}
+		if (person2 == null) {
+			return new PersonOut(
+					new Person()
+					.setError(
+							new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Friend not found by email")));
+		}
+		
+		person1.addToContacts(person2);
+		person2.addToContacts(person1);
+		personRepo.save(person1);
+		personRepo.save(person2);
+		
+		return new PersonOut(person2);
     }
 	
 	/**
@@ -401,5 +436,28 @@ public class PersonServices {
 		personRepo.save(person);
 		
 		return new PersonOut(person).toPublic();
+    }
+	
+	/**
+	 * Delete a Person
+	 * @param personId The Id of the person
+	 * @return PersonOut
+	 */
+	@RequestMapping(value="/deleteperson", method=RequestMethod.GET)
+    public PersonOut deletePerson(@RequestParam(value="pId", defaultValue="0") long personId) {
+    	
+		Person person = personRepo.findById(personId);
+		if (person == null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
+					.toPublic();
+		}
+		
+		person.setEnabled(false);
+		
+		personRepo.save(person);
+		
+		return new PersonOut(person);
     }
 }

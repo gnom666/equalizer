@@ -21,12 +21,15 @@ import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
 import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
+import equalizer.model.Payment;
 import equalizer.model.Person;
 import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
+import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.ActivityOut;
+import equalizer.viewmodel.PaymentOut;
 
 /**
  * Activity Services
@@ -45,6 +48,9 @@ public class ActivitiesServices {
 	
 	@Autowired
 	private TaskRepository taskRepo;
+	
+	@Autowired
+	private PaymentsRepository paymentRepo;
 	
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -81,7 +87,7 @@ public class ActivitiesServices {
 	 * Add a new Activity
 	 * @param act The Activity
 	 * @return ActivityOut
-	 */
+	 *
 	@RequestMapping(value="/addactivity", method=RequestMethod.POST)
     public ActivityOut addActivity(@RequestBody ActivityOut act) {
     	Activity activity = new Activity();
@@ -119,6 +125,51 @@ public class ActivitiesServices {
 		activityRepo.save(activity);
 		
 		return new ActivityOut(activity);
+    }*/
+	
+	/**
+	 * Add a new Activity
+	 * @param act The Activity
+	 * @return ActivityOut
+	 */
+	@RequestMapping(value="/addactivity", method=RequestMethod.POST)
+    public ActivityOut addActivity(@RequestBody ActivityOut act) {
+    	Activity activity = new Activity();
+    	
+    	Person owner = personRepo.findById(act.owner);
+    	if (owner == null) {
+    		return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.PERSON_NOT_FOUND, "Unknown owner " + act.owner)));
+    	}
+    	
+    	activity.setOwner(owner);
+		activity.setName(act.name);
+		activity.setDescription(act.description);
+		
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		try {
+			activity.setDate(format.parse(act.date));
+		} 	catch (ParseException e) {
+			e.printStackTrace();
+			return new ActivityOut(
+    				new Activity()
+    				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage())));
+		}
+		
+		activityRepo.save(activity);
+		
+		act.participants.forEach(pId -> {
+			Person participant = personRepo.findById(pId);
+			if (participant != null) {
+				participant.getActivities().add(activity);
+				personRepo.save(participant);
+			}
+		});
+		
+		activityRepo.save(activity);
+		
+		return new ActivityOut(activity);
     }
 	
 	/**
@@ -150,20 +201,22 @@ public class ActivitiesServices {
     				.setError(new Error(ErrorCode.ACTIVITY_SERVICES, ErrorType.BAD_DATE_FORMAT, e.getMessage())));
 		}
 		
-		List<Person> untouchables = new ArrayList<>();
+		List<Person> removables = new ArrayList<>();
 		activity.getParticipants().forEach(p -> {
 			List<Task> ptasks = taskRepo.findByActivityAndOwner(activity, p);
-			if (ptasks != null && ptasks.size() > 0) {
-				untouchables.add(p);
-			}
+			if (ptasks != null) {
+				if (ptasks.size() <= 0) {
+					removables.add(p);
+				}
+			}	
 		});
 		
-		activity.getParticipants().clear();		
-		untouchables.forEach(p -> activity.addParticipant(p));
+		removables.forEach(p -> p.getActivities().remove(activity));
 		act.participants.forEach(pId -> {
 			Person participant = personRepo.findById(pId);
-			if (participant != null) {
-				activity.addParticipant(participant);
+			if (participant != null && !participant.getActivities().contains(activity)) {
+				participant.getActivities().add(activity);
+				personRepo.save(participant);
 			}
 		});
 		
@@ -302,5 +355,37 @@ public class ActivitiesServices {
 		List<ActivityOut> result = new ArrayList<>();
 		activityRepo.findByNameContaining(name).forEach(a -> result.add(new ActivityOut(a)));
 		return result;
+    }
+	
+	/**
+	 * Delete an Activity
+	 * @param activityId The Id of the activity
+	 * @return ActivityOut
+	 */
+	@RequestMapping(value="/deleteactivity", method=RequestMethod.GET)
+    public ActivityOut deleteActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
+    	ActivityOut deletedActivity;
+		
+		Activity activity = activityRepo.findById(activityId);
+		if (activity == null) {
+			return new ActivityOut(
+					new Activity()
+					.setError(eConf.lastError().updateError(ErrorCode.ACTIVITY_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity not found")));
+		}
+		
+		deletedActivity = new ActivityOut(activity);
+		
+		paymentRepo.removeByActivity(activity);
+		
+		taskRepo.removeByActivity(activity);
+		
+		activity.getParticipants().forEach(p -> {
+			p.getActivities().remove(activity);
+			personRepo.save(p);
+		});
+		
+		activityRepo.delete(activity);
+		
+		return deletedActivity;
     }
 }

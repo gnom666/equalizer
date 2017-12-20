@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -45,8 +46,13 @@ public class Person {
 	@OneToMany(mappedBy = "owner")
 	private List<Activity> owns;
 
+	/*@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Activity.class)
+	@ManyToMany(mappedBy = "participants")*/
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Activity.class)
-	@ManyToMany(mappedBy = "participants")
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@JoinTable(	name = "person_activity", 
+				joinColumns = @JoinColumn(name = "person_id", referencedColumnName = "id"), 
+				inverseJoinColumns = @JoinColumn(name = "activity_id", referencedColumnName = "id"))
 	private List<Activity> activities;
 	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Task.class)
