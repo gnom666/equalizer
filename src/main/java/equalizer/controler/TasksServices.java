@@ -59,7 +59,7 @@ public class TasksServices {
 	 */
 	@RequestMapping(value="/tasksbyact", method=RequestMethod.GET)
     public List<TaskOut> tasksByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<TaskOut> result = new ArrayList<>();
 		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
@@ -80,7 +80,7 @@ public class TasksServices {
 	 */
 	@RequestMapping(value="/tasksbyowner", method=RequestMethod.GET)
     public List<TaskOut> tasksByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<TaskOut> result = new ArrayList<>();
 		Person owner = personRepo.findById(ownerId);
 		if (owner != null) {
@@ -103,7 +103,7 @@ public class TasksServices {
 	@RequestMapping(value="/tasksbyactandowner", method=RequestMethod.GET)
     public List<TaskOut> tasksByActivityAndOwner(@RequestParam(value="aId", defaultValue="0") long activityId, 
     											 @RequestParam(value="oId", defaultValue="0") long ownerId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<TaskOut> result = new ArrayList<>();
 		Activity activity = activityRepo.findById(activityId);
 		Person owner = personRepo.findById(ownerId);
@@ -132,7 +132,7 @@ public class TasksServices {
 	 */
 	@RequestMapping(value="/addtask", method=RequestMethod.POST)
     public TaskOut addTask(@RequestBody TaskOut tsk) {
-		
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Task task = new Task();
     	
     	Person owner = personRepo.findById(tsk.owner);
@@ -168,7 +168,7 @@ public class TasksServices {
 	 */
 	@RequestMapping(value="/modifytask", method=RequestMethod.POST)
     public TaskOut modifyTask(@RequestBody TaskOut tsk) {
-		
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Task task = taskRepo.findById(tsk.id);
 		if (task == null) {
 			return new TaskOut(
@@ -202,7 +202,7 @@ public class TasksServices {
 	 */
 	@RequestMapping(value="/deletetask", method=RequestMethod.GET)
     public TaskOut deleteTask (@RequestParam(value="tId", defaultValue="0") long taskId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Task task = taskRepo.findById(taskId);
 		if (task == null) {
 			return new TaskOut(

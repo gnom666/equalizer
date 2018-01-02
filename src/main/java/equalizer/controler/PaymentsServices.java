@@ -206,7 +206,7 @@ public class PaymentsServices {
     public List<PaymentOut> generatePayments(@RequestParam(value="aId", defaultValue="0") long activityId, 
 								    		 @RequestParam(value="pId", defaultValue="") long personId, 
 								    		 @RequestParam(value="redo", defaultValue="false") boolean reDo) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PaymentOut> result = new ArrayList<>();
 		Activity act = activityRepo.findById(activityId);
 		Person per = personRepo.findById(personId);
@@ -247,7 +247,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/testpayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PaymentOut> testPayments(@RequestParam(value="aId", defaultValue="0") long activityId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PaymentOut> result = new ArrayList<>();
 		Activity act = activityRepo.findById(activityId);
 		if (act != null) {
@@ -268,7 +268,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.GET)
     public List<PaymentOut> testPaymentsByActivity(@RequestParam(value="aId", defaultValue="0") String activityId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<Payment> paymentsList = paymentsRepo.findByActivityId(Long.decode(activityId));
 		ArrayList<PaymentOut> paymentsOutList = new ArrayList<>();
 		
@@ -284,7 +284,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/paymentsbyact", method=RequestMethod.DELETE)
     public List<PaymentOut> deletePaymentsByActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PaymentOut> result = new ArrayList<>();
 		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
@@ -312,7 +312,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/paymentsbyfrom", method=RequestMethod.GET)
     public List<PaymentOut> paymentsByFrom(@RequestParam(value="fId", defaultValue="0") long fromId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PaymentOut> result = new ArrayList<>();
 		Person person = personRepo.findById(fromId);
 		if (person != null) {
@@ -338,7 +338,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/paymentsbyto", method=RequestMethod.GET)
     public List<PaymentOut> paymentsByTo(@RequestParam(value="tId", defaultValue="0") long toId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PaymentOut> result = new ArrayList<>();
 		Person person = personRepo.findById(toId);
 		if (person != null) {
@@ -368,7 +368,7 @@ public class PaymentsServices {
 	@RequestMapping(value="/makepay", method=RequestMethod.GET)
     public PaymentOut makePayment(@RequestParam(value="fId", defaultValue="0") long fromId, 
     							  @RequestParam(value="pId", defaultValue="") long paymentId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(fromId);
 		Payment payment = paymentsRepo.findById(paymentId);
 		if (person != null && payment != null) {
@@ -399,7 +399,7 @@ public class PaymentsServices {
 	@RequestMapping(value="/acceptpay", method=RequestMethod.GET)
     public PaymentOut acceptPayment(@RequestParam(value="tId", defaultValue="0") long toId, 
     								@RequestParam(value="pId", defaultValue="") long paymentId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(toId);
 		Payment payment = paymentsRepo.findById(paymentId);
 		if (person != null && payment != null) {
@@ -430,7 +430,7 @@ public class PaymentsServices {
 	@RequestMapping(value="/suepay", method=RequestMethod.GET)
     public PaymentOut suePayment(@RequestParam(value="tId", defaultValue="0") long toId, 
     							 @RequestParam(value="pId", defaultValue="") long paymentId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(toId);
 		Payment payment = paymentsRepo.findById(paymentId);
 		if (person != null && payment != null) {
@@ -459,7 +459,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/resetpay", method=RequestMethod.GET)
     public PaymentOut resetPayment(@RequestParam(value="pId", defaultValue="0") long paymentId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Payment payment = paymentsRepo.findById(paymentId);
 		if (payment != null) {
 			if (payment.getStatus() != PaymentStatus.PAID) {
@@ -482,7 +482,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/forceresetpay", method=RequestMethod.GET)
     public PaymentOut forceResetPayment(@RequestParam(value="pId", defaultValue="0") long paymentId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Payment payment = paymentsRepo.findById(paymentId);
 		if (payment != null) {
 			payment.setStatus(PaymentStatus.PENDING);
@@ -500,6 +500,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/lasterror", method=RequestMethod.GET)
     public Error getLastError() {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		return eConf.lastError();
     }
 	
@@ -510,7 +511,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/deletepayment", method=RequestMethod.GET)
     public PaymentOut deletePayment(@RequestParam(value="tId", defaultValue="0") long paymentId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Payment payment = paymentsRepo.findById(paymentId);
 		if (payment == null) {
 			return new PaymentOut(

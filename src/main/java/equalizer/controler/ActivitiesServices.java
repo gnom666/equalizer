@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +64,7 @@ public class ActivitiesServices {
 	@RequestMapping(value="/activitiesbyowner", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByOwner(@RequestParam(value="oId", defaultValue="0") long ownerId) {
     	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<ActivityOut> result = new ArrayList<>();
 		Person owner = personRepo.findById(ownerId);
 		if (owner != null) {
@@ -134,6 +136,7 @@ public class ActivitiesServices {
 	 */
 	@RequestMapping(value="/addactivity", method=RequestMethod.POST)
     public ActivityOut addActivity(@RequestBody ActivityOut act) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Activity activity = new Activity();
     	
     	Person owner = personRepo.findById(act.owner);
@@ -179,6 +182,7 @@ public class ActivitiesServices {
 	 */
 	@RequestMapping(value="/modifyactivity", method=RequestMethod.POST)
     public ActivityOut modifyActivity(@RequestBody ActivityOut act) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Error error = null;
     	
     	Activity activity = activityRepo.findById(act.id);
@@ -232,7 +236,7 @@ public class ActivitiesServices {
 	 */
 	@RequestMapping(value="/activitiesbyparticipant", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByParticipant(@RequestParam(value="pId", defaultValue="0") long personId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<ActivityOut> result = new ArrayList<>();
 		Person person = personRepo.findById(personId);
 		if (person != null) {
@@ -262,7 +266,7 @@ public class ActivitiesServices {
 	@RequestMapping(value="/addparticipant", method=RequestMethod.GET)
     public ActivityOut addParticipant(@RequestParam(value="aId", defaultValue="0") long activityId,
     								  @RequestParam(value="pId", defaultValue="0") long personId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
 			Person person = personRepo.findById(personId);
@@ -293,7 +297,7 @@ public class ActivitiesServices {
 	@RequestMapping(value="/removeparticipant", method=RequestMethod.GET)
     public ActivityOut removeParticipant(@RequestParam(value="aId", defaultValue="0") long activityId,
     									 @RequestParam(value="pId", defaultValue="0") long personId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Activity activity = activityRepo.findById(activityId);
 		if (activity != null) {
 			Person person = personRepo.findById(personId);
@@ -321,7 +325,7 @@ public class ActivitiesServices {
 	 */
 	@RequestMapping(value="/removeallparticipants", method=RequestMethod.GET)
     public ActivityOut removeAllParticipants(@RequestParam(value="aId", defaultValue="0") long activityId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Activity activity = activityRepo.findById(activityId);
 		
 		if (activity != null) {
@@ -351,7 +355,7 @@ public class ActivitiesServices {
 	 */
 	@RequestMapping(value="/activitiesbyname", method=RequestMethod.GET)
     public List<ActivityOut> getActivitiesByName(@RequestParam(value="name", defaultValue="") String name) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<ActivityOut> result = new ArrayList<>();
 		activityRepo.findByNameContaining(name).forEach(a -> result.add(new ActivityOut(a)));
 		return result;
@@ -364,7 +368,8 @@ public class ActivitiesServices {
 	 */
 	@RequestMapping(value="/deleteactivity", method=RequestMethod.GET)
     public ActivityOut deleteActivity(@RequestParam(value="aId", defaultValue="0") long activityId) {
-    	ActivityOut deletedActivity;
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		ActivityOut deletedActivity;
 		
 		Activity activity = activityRepo.findById(activityId);
 		if (activity == null) {

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import equalizer.controlermodel.Error;
+import equalizer.controlermodel.Logger;
 import equalizer.controler.CustomErrorController;
 import equalizer.controlermodel.Constants.*;
 
@@ -23,5 +24,8 @@ public class EqualizerConfiguration {
 
 	@Bean
 	public CustomErrorController customErrorController(){return new CustomErrorController(errorAttributes);}
+	
+	@Bean
+	public Logger logger() { return new Logger();}
 	
 }

@@ -4,10 +4,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -60,7 +63,7 @@ public class GeneralServices {
 	 */
 	@RequestMapping(value="/init", method=RequestMethod.GET)
     public String init() {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		StringBuffer result = new StringBuffer();
     	
 		Role roleAdm = new Role();
@@ -359,8 +362,7 @@ public class GeneralServices {
     	result.append("OK\n");
     	//*/
     	
-    	
-		return result.toString();
+    	return result.toString();
     }
 	
 	private int commute (int x) {
@@ -370,6 +372,7 @@ public class GeneralServices {
 	private String bufferToStr (List<Character> buffer) {
 		StringBuilder sb = new StringBuilder();
 		buffer.forEach(c -> sb.append(c));
+		
 		return sb.toString();
 	}
 	
@@ -380,6 +383,7 @@ public class GeneralServices {
 	@RequestMapping(value="/logtail", method=RequestMethod.GET)
     public String getLogTail(@RequestParam(value="log", defaultValue="out.log") String logName,
     		@RequestParam(value="size", defaultValue="100") int bufferSize) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		String result = "";
 		
 		int size = bufferSize * 1024;
@@ -422,16 +426,28 @@ public class GeneralServices {
 	    result = bufferToStr(buffer.subList(commuted * limit + i, commuted * limit + limit)) +
 	    		bufferToStr(buffer.subList(switcher * limit, switcher * limit + i));
 		
-		return result;
+	    return result;
 	}
 	
 	/**
 	 * Connection Test
 	 * @return String PONG
 	 */
-	@RequestMapping(value="/ping", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+	@RequestMapping(value="/ping", method=RequestMethod.GET, produces="application/text;charset=UTF-8")
     public String ping() {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		return "PONG";
+    }
+	
+	/**
+	 * Returns the timestamp
+	 * @return
+	 */
+	@RequestMapping(value="/timestamp", method=RequestMethod.GET, produces="application/text;charset=UTF-8")
+	public String timestamp () {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		String result = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(Calendar.getInstance().getTime());
+		return result;
     }
 	
 }

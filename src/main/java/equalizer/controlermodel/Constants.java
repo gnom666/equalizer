@@ -2,6 +2,15 @@ package equalizer.controlermodel;
 
 public final class Constants {
 	
+	public static enum LogLevel {
+		NONE,
+		DEBUG,
+		INFO,
+		ERROR
+	}
+	
+	public static LogLevel loglevel = LogLevel.INFO;
+	
 	public static enum ErrorCode {
 		UNKNOWN,
 		ACTIVITY_SERVICES,

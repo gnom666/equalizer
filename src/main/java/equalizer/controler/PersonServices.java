@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -77,6 +78,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/userslist", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> usersList() {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PersonOut> all = new ArrayList<>();
 		personRepo.findAll().forEach(p -> all.add(new PersonOut(p).toPublic()));
 		return all;
@@ -89,11 +91,13 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/usersbyname", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public Set<PersonOut> usersList(@RequestParam(value="name", defaultValue="0") String name) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Set<PersonOut> all = new LinkedHashSet<>();
 		personRepo.findByFirstNameContaining(name).forEach(p -> all.add(new PersonOut(p).toPublic()));
 		personRepo.findByLastNameContaining(name).forEach(p -> {
 			if (!containsPerson(all, p)) all.add(new PersonOut(p).toPublic());
 		});
+		
 		return all;
     }
 	
@@ -104,6 +108,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/userbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public PersonOut userById(@RequestParam(value="pId", defaultValue="0") long id) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Person person = personRepo.findById(id);
 		if (person != null) {
 			return new PersonOut(person).toPublic();
@@ -116,6 +121,7 @@ public class PersonServices {
 	
 	@RequestMapping(value="/participantsbyact", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> participantsByActivity(@RequestParam(value="aId", defaultValue="0") long id) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	ArrayList<PersonOut> participants = new ArrayList<>();
 		Activity activity = activityRepo.findById(id);
     	if (activity != null) {
@@ -133,6 +139,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/contactsidsbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<Long> contactsIdsById(@RequestParam(value="pId", defaultValue="0") long id) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Person person = personRepo.findById(id);
 		if (person != null) {
 			return new PersonOut(person).contacts;
@@ -147,6 +154,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/contactofidsbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<Long> contactOfIdsById(@RequestParam(value="pId", defaultValue="0") long id) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Person person = personRepo.findById(id);
 		if (person != null) {
 			return new PersonOut(person).contactOf;
@@ -161,6 +169,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/contactsbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> contactsById(@RequestParam(value="pId", defaultValue="0") long id) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	List<PersonOut> contacts = new ArrayList<>();		
 		Person person = personRepo.findById(id);
 		if (person != null) {
@@ -176,6 +185,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/contactofbyid", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> contactOfById(@RequestParam(value="pId", defaultValue="0") long id) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PersonOut> contactOf = new ArrayList<>();		
 		Person person = personRepo.findById(id);
 		if (person != null) {
@@ -193,6 +203,7 @@ public class PersonServices {
 	@RequestMapping(value="/setfriends", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> setFriends(@RequestParam(value="person1Id", defaultValue="0") long id1, 
     								 @RequestParam(value="person2Id", defaultValue="0") long id2) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PersonOut> friends = new ArrayList<>();		
 		Person person1 = personRepo.findById(id1);
 		Person person2 = personRepo.findById(id2);
@@ -226,6 +237,7 @@ public class PersonServices {
 	@RequestMapping(value="/setfriendbyemail", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public PersonOut setFriendByEmail(@RequestParam(value="pId", defaultValue="0") long id, 
     								 @RequestParam(value="email", defaultValue="") String email) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person1 = personRepo.findById(id);
 		Person person2 = personRepo.findByEmail(email);
 		
@@ -240,6 +252,12 @@ public class PersonServices {
 					new Person()
 					.setError(
 							new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Friend not found by email")));
+		}
+		if (person1.getId() == person2.getId()) {
+			return new PersonOut(
+					new Person()
+					.setError(
+							new Error(ErrorCode.PERSON_SERVICES, ErrorType.UNKNOWN, "Friend is the same person")));
 		}
 		
 		person1.addToContacts(person2);
@@ -259,6 +277,7 @@ public class PersonServices {
 	@RequestMapping(value="/unsetfriends", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> unsetFriends(@RequestParam(value="person1Id", defaultValue="0") long id1, 
     									@RequestParam(value="person2Id", defaultValue="0") long id2) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PersonOut> friends = new ArrayList<>();		
 		Person person1 = personRepo.findById(id1);
 		Person person2 = personRepo.findById(id2);
@@ -292,6 +311,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/checkuser", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public PersonOut checkUser(@RequestParam(value="u", defaultValue="") String user) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Person person = personRepo.findByEmail(user);
 		if (person != null) {
 			return new PersonOut(person).toPublic();
@@ -311,6 +331,7 @@ public class PersonServices {
 	@RequestMapping(value="/checkpassword", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public PersonOut checkPassword(@RequestParam(value="uId", defaultValue="0") long userId, 
     									 @RequestParam(value="uPass", defaultValue="0") String password) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
     	Person person = personRepo.findById(userId);
 		if (person != null) {
 			if (person.getPassword().equals(password)) {
@@ -337,7 +358,8 @@ public class PersonServices {
 	@RequestMapping(value="/checkuserandpass", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public PersonOut checkPassword(@RequestParam(value="uName", defaultValue="0") String username, 
     									 @RequestParam(value="uPass", defaultValue="0") String password) {
-    	Person person = personRepo.findByEmail(username);
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		Person person = personRepo.findByEmail(username);
 		if (person != null) {
 			if (person.getPassword().equals(password)) {
 				if (person.isEnabled()) {
@@ -368,7 +390,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/addperson", method=RequestMethod.POST)
     public PersonOut addPerson(@RequestBody PersonOut p) {
-		
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findByEmail(p.email);
 		System.out.println(p.toString());
 		
@@ -409,7 +431,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/modifyperson", method=RequestMethod.POST)
     public PersonOut modifyPerson(@RequestBody PersonOut p) {
-		
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(p.id);
 		System.out.println(p.toString());
 		
@@ -445,7 +467,7 @@ public class PersonServices {
 	 */
 	@RequestMapping(value="/deleteperson", method=RequestMethod.GET)
     public PersonOut deletePerson(@RequestParam(value="pId", defaultValue="0") long personId) {
-    	
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(personId);
 		if (person == null) {
 			return new PersonOut(
