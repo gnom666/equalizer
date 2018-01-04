@@ -22,6 +22,8 @@ public class PersonDetails implements UserDetails {
 	private Collection<? extends GrantedAuthority> authorities;
 	private boolean enabled;
 	
+	private static final long serialVersionUID = 1L;
+	
 	public PersonDetails(Person person) {
 		this.username = person.getEmail();
 		this.password = person.getPassword();

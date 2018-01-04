@@ -2,7 +2,6 @@ package equalizer.controler;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilterInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,15 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 import equalizer.config.EqualizerConfiguration;
 import equalizer.controlermodel.Constants.RoleType;
 import equalizer.model.Activity;
+import equalizer.model.Attachment;
 import equalizer.model.Person;
 import equalizer.model.Role;
 import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
-import equalizer.repository.PaymentsRepository;
+import equalizer.repository.AttachmentRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.RoleRepository;
 import equalizer.repository.TaskRepository;
-import equalizer.viewmodel.PersonOut;
 
 /**
  * General Services
@@ -46,10 +44,10 @@ public class GeneralServices {
 	private TaskRepository taskRepo;
 	
 	@Autowired
-	private PersonRepository personRepo;
+	private AttachmentRepository attachmentRepo;
 	
 	@Autowired
-	private PaymentsRepository paymentRepo;
+	private PersonRepository personRepo;
 	
 	@Autowired
 	private RoleRepository roleRepo;
@@ -86,6 +84,8 @@ public class GeneralServices {
     	Task food = new Task();
     	Task decoration = new Task();
     	
+    	Attachment attachment = null;
+    	
     	//* Alta de roles de prueba
     	try {
     		result.append("Alta de roles de prueba...");
@@ -101,7 +101,7 @@ public class GeneralServices {
 	    	roleRepo.save(roleGuest);
 	    	
     	}	catch (Exception e) {
-    		result.append("ERROR\n");
+    		result.append("ERROR\n" + e.getMessage());
     		return result.toString();
     	}
     	result.append("OK\n");
@@ -193,7 +193,7 @@ public class GeneralServices {
 	    	personRepo.save(personE);
 	    	
     	}	catch (Exception e) {
-    		result.append("ERROR\n");
+    		result.append("ERROR\n" + e.getMessage());
     		return result.toString();
     	}
     	result.append("OK\n");
@@ -211,6 +211,7 @@ public class GeneralServices {
 	    	halloween.setDescription("Halloween party");
 	    	
 	    	activityRepo.save(halloween);
+	    	Thread.sleep(1000);
 	    	
 	    	thanksgiving.setDate(new Date());
 	    	thanksgiving.setName("Thanksgiving");
@@ -222,7 +223,7 @@ public class GeneralServices {
 	    	activityRepo.save(thanksgiving);
     	
     	}	catch (Exception e) {
-    		result.append("ERROR\n");
+    		result.append("ERROR\n" + e.getMessage());
     		return result.toString();
     	}
     	result.append("OK\n");
@@ -264,7 +265,7 @@ public class GeneralServices {
     		personRepo.save(personD);
     	
     	}	catch (Exception e) {
-    		result.append("ERROR\n");
+    		result.append("ERROR\n" + e.getMessage());
     		return result.toString();
     	}
     	result.append("OK\n");
@@ -280,30 +281,47 @@ public class GeneralServices {
 	    	drinks.setCalculated(false);
 	    	drinks.setDescription("Cervezas, ron y refrescos");
 	    	drinks.setOwner(personA);
+	    	attachment = new Attachment("fotoDrinks.jpg", "");
+	    	attachmentRepo.save(attachment);
+	    	drinks.setAttachment(attachment);
+	    	
 	    	rent.setActivity(halloween);
 	    	rent.setName("Renta");
 	    	rent.setAmmount(80);
 	    	rent.setCalculated(false);
 	    	rent.setDescription("Renta del local");
 	    	rent.setOwner(personB);
+	    	attachment = new Attachment("fotoRent.jpg", "");
+	    	attachmentRepo.save(attachment);
+	    	rent.setAttachment(attachment);
+	    	
 	    	transportation.setActivity(halloween);
 	    	transportation.setName("Taxi");
 	    	transportation.setAmmount(120);
 	    	transportation.setCalculated(false);
 	    	transportation.setDescription("Alquiler de vehiculos");
 	    	transportation.setOwner(personC);
+	    	attachment = new Attachment("fotoTransportation.jpg", "");
+	    	attachmentRepo.save(attachment);
+	    	transportation.setAttachment(attachment);
+	    	
 	    	food.setActivity(halloween);
 	    	food.setName("Comida");
 	    	food.setAmmount(150);
 	    	food.setCalculated(false);
 	    	food.setDescription("Elaboracion de tapas");
 	    	food.setOwner(personD);
+	    	food.setAttachment(null);
+	    	
 	    	decoration.setActivity(halloween);
 	    	decoration.setName("Adornos");
 	    	decoration.setAmmount(30);
 	    	decoration.setCalculated(false);
 	    	decoration.setDescription("Decoracion del local");
 	    	decoration.setOwner(personB);
+	    	attachment = new Attachment("fotoDecoration.jpg", "");
+	    	attachmentRepo.save(attachment);
+	    	decoration.setAttachment(attachment);
 	    	
 	    	taskRepo.save(drinks);
 	    	taskRepo.save(rent);
@@ -324,24 +342,28 @@ public class GeneralServices {
 	    	drinks.setCalculated(false);
 	    	drinks.setDescription("Cervezas, ron y refrescos");
 	    	drinks.setOwner(personA);
+	    	
 	    	rent.setActivity(thanksgiving);
 	    	rent.setName("Renta");
 	    	rent.setAmmount(1080);
 	    	rent.setCalculated(false);
 	    	rent.setDescription("Renta del local");
 	    	rent.setOwner(personB);
+	    	
 	    	transportation.setActivity(thanksgiving);
 	    	transportation.setName("Taxi");
 	    	transportation.setAmmount(1120);
 	    	transportation.setCalculated(false);
 	    	transportation.setDescription("Alquiler de vehiculos");
 	    	transportation.setOwner(personC);
+	    	
 	    	food.setActivity(thanksgiving);
 	    	food.setName("Comida");
 	    	food.setAmmount(1150);
 	    	food.setCalculated(false);
 	    	food.setDescription("Elaboracion de tapas");
 	    	food.setOwner(personB);
+	    	
 	    	decoration.setActivity(thanksgiving);
 	    	decoration.setName("Adornos");
 	    	decoration.setAmmount(1030);
@@ -356,7 +378,7 @@ public class GeneralServices {
 	    	taskRepo.save(decoration);
     	
     	}	catch (Exception e) {
-    		result.append("ERROR\n");
+    		result.append("ERROR\n" + e.getMessage());
     		return result.toString();
     	}
     	result.append("OK\n");
@@ -418,6 +440,9 @@ public class GeneralServices {
 		    		switcher = commute(switcher);
 		    	}
 		    }
+		    
+		    fis.close();
+		    
 	    } 	catch (IOException e) {
 	    	return e.getMessage();
 	    }

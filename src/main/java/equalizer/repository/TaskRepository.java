@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import equalizer.model.Activity;
-import equalizer.model.Payment;
 import equalizer.model.Person;
 import equalizer.model.Task;
 

@@ -16,7 +16,8 @@ public final class Constants {
 		ACTIVITY_SERVICES,
 		PAYMENTS_SERVICES,
 		PERSON_SERVICES,
-		TASKS_SERVICES
+		TASKS_SERVICES,
+		ATTACHMENT_SERVICES
 	}
 	
 	public static String errorCodeName (ErrorCode code) {
@@ -35,6 +36,9 @@ public final class Constants {
 		case TASKS_SERVICES:
 			codeName = "TASKS_SERVICES";
 			break;
+		case ATTACHMENT_SERVICES:
+			codeName = "ATTACHMENT_SERVICES";
+			break;
 		default:
 			codeName = "UNKNOWN";
 		}
@@ -47,6 +51,7 @@ public final class Constants {
 	    PAYMENT_NOT_FOUND,
 		PERSON_NOT_FOUND,
 		TASK_NOT_FOUND,
+		ATTACHMENT_NOT_FOUND,
 		ACTIVITYOWNER_MISSMATCH,
 		PAYMENTSLISTS_MISSMATCH,
 		PAYMENT_USERMISSMATCH,
@@ -100,6 +105,9 @@ public final class Constants {
 			break;
 		case PERSON_DISABLED:
 			typeName = "PERSON_DISABLED";
+			break;
+		case ATTACHMENT_NOT_FOUND:
+			typeName = "ATTACHMENT_NOT_FOUND";
 			break;
 		default:
 			typeName = "UNKNOWN";

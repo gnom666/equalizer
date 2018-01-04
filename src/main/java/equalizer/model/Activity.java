@@ -6,14 +6,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -79,10 +77,12 @@ public class Activity {
 		this.date = new Date();
 	}
 	
-	@PreRemove
-	public void preRemove () {
-		owner.getOwns().remove(this);
-		participants.forEach(p -> p.getActivities().remove(this));
+	public List<Person> addParticipant (Person person) {
+		for (Person p : participants) {
+			if (p.getId() == person.getId()) return participants;
+		}
+		participants.add(person);
+		return participants;
 	}
 
 	public Date getDate() {
@@ -96,6 +96,7 @@ public class Activity {
 	public Error getError() {
 		return error;
 	}
+	
 	public long getId() {
 		return id;
 	}
@@ -132,11 +133,31 @@ public class Activity {
 		return calculated;
 	}
 
+	@PreRemove
+	public void preRemove () {
+		owner.getOwns().remove(this);
+		participants.forEach(p -> p.getActivities().remove(this));
+	}
+	
+	public List<Person> removeParticipant (Person person) {
+		for (Person p : participants) {
+			if (p.getId() == person.getId()) {
+				participants.remove(p);
+				return participants;
+			}
+		}
+		return participants;
+	}
+
+	public void removeParticipants () {
+		participants.clear();
+	}
+
 	public void setCalculated(boolean calculated) {
 		this.calculated = calculated;
 		updateModified();
 	}
-	
+
 	public void setDate(Date date) {
 		this.date = date;
 		updateModified();
@@ -150,16 +171,16 @@ public class Activity {
 		this.error = error;
 		return this;
 	}
-
+	
 	public void setModified(String modified) {
 		this.modified = modified;
 	}
-
+	
 	public void setName(String name) {
 		this.name = name;
 		updateModified();
 	}
-
+	
 	public void setOwner(Person owner) {
 		this.owner = owner;
 		updateModified();
@@ -170,33 +191,11 @@ public class Activity {
 		updateModified();
 	}
 	
-	public List<Person> addParticipant (Person person) {
-		for (Person p : participants) {
-			if (p.getId() == person.getId()) return participants;
-		}
-		participants.add(person);
-		return participants;
-	}
-	
-	public List<Person> removeParticipant (Person person) {
-		for (Person p : participants) {
-			if (p.getId() == person.getId()) {
-				participants.remove(p);
-				return participants;
-			}
-		}
-		return participants;
-	}
-	
-	public void removeParticipants () {
-		participants.clear();
-	}
-
 	public void setPayments(List<Payment> payments) {
 		this.payments = payments;
 		updateModified();
 	}
-	
+
 	public void setTasks(List<Task> tasks) {
 		this.tasks = tasks;
 		updateModified();

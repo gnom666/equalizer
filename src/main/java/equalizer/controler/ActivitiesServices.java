@@ -4,12 +4,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,7 +19,6 @@ import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
 import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
-import equalizer.model.Payment;
 import equalizer.model.Person;
 import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
@@ -30,7 +26,6 @@ import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.ActivityOut;
-import equalizer.viewmodel.PaymentOut;
 
 /**
  * Activity Services
@@ -183,7 +178,6 @@ public class ActivitiesServices {
 	@RequestMapping(value="/modifyactivity", method=RequestMethod.POST)
     public ActivityOut modifyActivity(@RequestBody ActivityOut act) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
-    	Error error = null;
     	
     	Activity activity = activityRepo.findById(act.id);
     	if (activity == null) {
@@ -240,7 +234,7 @@ public class ActivitiesServices {
 		List<ActivityOut> result = new ArrayList<>();
 		Person person = personRepo.findById(personId);
 		if (person != null) {
-			List<Activity> activitiesList = activityRepo.findByParticipantsIn(person);
+			List<Activity> activitiesList = activityRepo.findByParticipantsInOrderByDateDesc(person);
 			if (activitiesList != null) {
 				activitiesList.forEach(a->result.add(new ActivityOut(a)));
 			}	else {

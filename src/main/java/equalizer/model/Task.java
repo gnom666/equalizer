@@ -9,15 +9,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.PreRemove;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
-
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import equalizer.controlermodel.Constants;
 import equalizer.controlermodel.Error;
 
 /**
@@ -42,26 +39,26 @@ public class Task {
     @JoinColumn(name="activity_id")
     private Activity activity;
 	
-	private String name;
-	private String description;
-	private String modified;
-
-	private boolean calculated;
-
-	private double ammount;
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Attachment.class)
+	@OneToOne
+	@JoinColumn(name="attachment_id")
+    private Attachment attachment;
 	
+	
+	private String name;
+
+	private String description;
+
+	private String modified;
+	private boolean calculated;
+	private double ammount;
+
 	@Transient
 	private Error error = null;
-	
+
 	public Task() {
 		this.owner = new Person();
 		this.activity = new Activity();
-	}
-
-	@PreRemove
-	public void preRemove () {
-		owner.getOwns().remove(this);
-		activity.getTasks().remove(this);
 	}
 	
 	public Activity getActivity() {
@@ -71,22 +68,33 @@ public class Task {
 	public double getAmmount() {
 		return ammount;
 	}
+
+	/*@PreRemove
+	public void preRemove () {
+		owner.getOwns().remove(this);
+		activity.getTasks().remove(this);
+	}*/
+	
+	public Attachment getAttachment() {
+		return attachment;
+	}
 	
 	public String getDescription() {
 		return description;
 	}
+	
 	public Error getError() {
 		return error;
 	}
-		
+	
 	public long getId() {
 		return id;
 	}
-	
+		
 	public String getModified() {
 		return modified;
 	}
-
+	
 	public String getName() {
 		return name;
 	}
@@ -98,15 +106,19 @@ public class Task {
 	public boolean isCalculated() {
 		return calculated;
 	}
-	
+
 	public void setActivity(Activity activity) {
 		this.activity = activity;
 		updateModified();
 	}
-
+	
 	public void setAmmount(double ammount) {
 		this.ammount = ammount;
 		updateModified();
+	}
+
+	public void setAttachment(Attachment attachment) {
+		this.attachment = attachment;
 	}
 
 	public void setCalculated(boolean calculated) {

@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import equalizer.config.EqualizerConfiguration;
+import equalizer.controlermodel.Constants.ErrorCode;
+import equalizer.controlermodel.Constants.ErrorType;
+import equalizer.controlermodel.Constants.PaymentStatus;
 import equalizer.controlermodel.Error;
 import equalizer.controlermodel.Node;
 import equalizer.controlermodel.Row;
 import equalizer.controlermodel.Table;
-import equalizer.controlermodel.Constants.*;
 import equalizer.model.Activity;
 import equalizer.model.Payment;
 import equalizer.model.Person;
@@ -26,7 +28,6 @@ import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.TaskRepository;
 import equalizer.viewmodel.PaymentOut;
-import equalizer.viewmodel.TaskOut;
 
 /**
  * Payment Services
@@ -88,14 +89,14 @@ public class PaymentsServices {
 		List<Payment> generatedPayments = new ArrayList<>();
 		
 		//* eliminate previous payments if redo
-		List<Payment> deletedPayments = null;
+		//List<Payment> deletedPayments = null;
 		// a new payment not calculated is a reason for redo
 		for (Task t : act.getTasks()) {
 			if (!t.isCalculated())
 				redo = true;
 		}
 		if (redo) {
-			deletedPayments = paymentsRepo.removeByActivity(act);
+			/*deletedPayments = */paymentsRepo.removeByActivity(act);
 		}
 		
 		//*/

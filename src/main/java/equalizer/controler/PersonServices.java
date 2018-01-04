@@ -1,16 +1,11 @@
 package equalizer.controler;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,14 +21,11 @@ import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
 import equalizer.model.Person;
 import equalizer.model.Role;
-import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
 import equalizer.repository.RoleRepository;
-import equalizer.viewmodel.ActivityOut;
 import equalizer.viewmodel.PersonOut;
-import equalizer.viewmodel.TaskOut;
 
 /**
  * Person Services
@@ -119,6 +111,11 @@ public class PersonServices {
 				.toPublic();
     }
 	
+	/**
+	 * Gets the partcipants of one Activity
+	 * @param id The Id of the Activity
+	 * @return List<PersonOut>
+	 */
 	@RequestMapping(value="/participantsbyact", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PersonOut> participantsByActivity(@RequestParam(value="aId", defaultValue="0") long id) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
@@ -392,7 +389,6 @@ public class PersonServices {
     public PersonOut addPerson(@RequestBody PersonOut p) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findByEmail(p.email);
-		System.out.println(p.toString());
 		
 		if (person != null) {
 			return new PersonOut(
