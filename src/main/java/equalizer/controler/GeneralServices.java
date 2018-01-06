@@ -20,11 +20,13 @@ import equalizer.controlermodel.Constants.RoleType;
 import equalizer.model.Activity;
 import equalizer.model.Attachment;
 import equalizer.model.Person;
+import equalizer.model.Registration;
 import equalizer.model.Role;
 import equalizer.model.Task;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.AttachmentRepository;
 import equalizer.repository.PersonRepository;
+import equalizer.repository.RegistrationRepository;
 import equalizer.repository.RoleRepository;
 import equalizer.repository.TaskRepository;
 
@@ -51,6 +53,9 @@ public class GeneralServices {
 	
 	@Autowired
 	private RoleRepository roleRepo;
+	
+	@Autowired
+	private RegistrationRepository regRepo;
 
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -86,6 +91,8 @@ public class GeneralServices {
     	
     	Attachment attachment = null;
     	
+    	Registration registration = null;
+    	
     	//* Alta de roles de prueba
     	try {
     		result.append("Alta de roles de prueba...");
@@ -117,7 +124,10 @@ public class GeneralServices {
 	    	personA.setEmail("a@eq.com");
 	    	personA.setNumpers(1);
 	    	personA.setRole(roleAdm);
-	    	personA.setEnabled(true);
+	    	personA.setEnabled(false);
+	    	registration = new Registration();
+	    	regRepo.save(registration);
+	    	personA.setRegistration(registration);
 	    	
 	    	personB.setFirstName("B.");
 	    	personB.setLastName("Beluga");
@@ -125,7 +135,10 @@ public class GeneralServices {
 	    	personB.setEmail("b@eq.com");
 	    	personB.setNumpers(2);
 	    	personB.setRole(roleCUser);
-	    	personB.setEnabled(true);
+	    	personB.setEnabled(false);
+	    	registration = new Registration();
+	    	regRepo.save(registration);
+	    	personB.setRegistration(registration);
 	    	
 	    	personC.setFirstName("C.");
 	    	personC.setLastName("Castor");
@@ -133,7 +146,10 @@ public class GeneralServices {
 	    	personC.setEmail("c@eq.com");
 	    	personC.setNumpers(2);
 	    	personC.setRole(roleCUser);
-	    	personC.setEnabled(true);
+	    	personC.setEnabled(false);
+	    	registration = new Registration();
+	    	regRepo.save(registration);
+	    	personC.setRegistration(registration);
 	    	
 	    	personD.setFirstName("D.");
 	    	personD.setLastName("Dodo");
@@ -141,7 +157,10 @@ public class GeneralServices {
 	    	personD.setEmail("d@eq.com");
 	    	personD.setNumpers(3);
 	    	personD.setRole(roleCUser);
-	    	personD.setEnabled(true);
+	    	personD.setEnabled(false);
+	    	registration = new Registration();
+	    	regRepo.save(registration);
+	    	personD.setRegistration(registration);
 	    	
 	    	personE.setFirstName("E.");
 	    	personE.setLastName("Erizo");
@@ -149,7 +168,10 @@ public class GeneralServices {
 	    	personE.setEmail("e@eq.com");
 	    	personE.setNumpers(1);
 	    	personE.setRole(roleGuest);
-	    	personE.setEnabled(true);
+	    	personE.setEnabled(false);
+	    	registration = new Registration();
+	    	regRepo.save(registration);
+	    	personE.setRegistration(registration);
 	    	
 	    	personRepo.save(personA);
 	    	personRepo.save(personB);
@@ -277,7 +299,7 @@ public class GeneralServices {
    
 	    	drinks.setActivity(halloween);
 	    	drinks.setName("Bebidas");
-	    	drinks.setAmmount(100);
+	    	drinks.setAmount(100);
 	    	drinks.setCalculated(false);
 	    	drinks.setDescription("Cervezas, ron y refrescos");
 	    	drinks.setOwner(personA);
@@ -287,7 +309,7 @@ public class GeneralServices {
 	    	
 	    	rent.setActivity(halloween);
 	    	rent.setName("Renta");
-	    	rent.setAmmount(80);
+	    	rent.setAmount(80);
 	    	rent.setCalculated(false);
 	    	rent.setDescription("Renta del local");
 	    	rent.setOwner(personB);
@@ -297,7 +319,7 @@ public class GeneralServices {
 	    	
 	    	transportation.setActivity(halloween);
 	    	transportation.setName("Taxi");
-	    	transportation.setAmmount(120);
+	    	transportation.setAmount(120);
 	    	transportation.setCalculated(false);
 	    	transportation.setDescription("Alquiler de vehiculos");
 	    	transportation.setOwner(personC);
@@ -307,7 +329,7 @@ public class GeneralServices {
 	    	
 	    	food.setActivity(halloween);
 	    	food.setName("Comida");
-	    	food.setAmmount(150);
+	    	food.setAmount(150);
 	    	food.setCalculated(false);
 	    	food.setDescription("Elaboracion de tapas");
 	    	food.setOwner(personD);
@@ -315,7 +337,7 @@ public class GeneralServices {
 	    	
 	    	decoration.setActivity(halloween);
 	    	decoration.setName("Adornos");
-	    	decoration.setAmmount(30);
+	    	decoration.setAmount(30);
 	    	decoration.setCalculated(false);
 	    	decoration.setDescription("Decoracion del local");
 	    	decoration.setOwner(personB);
@@ -338,35 +360,35 @@ public class GeneralServices {
 	    	
 	    	drinks.setActivity(thanksgiving);
 	    	drinks.setName("Bebidas");
-	    	drinks.setAmmount(1100);
+	    	drinks.setAmount(1100);
 	    	drinks.setCalculated(false);
 	    	drinks.setDescription("Cervezas, ron y refrescos");
 	    	drinks.setOwner(personA);
 	    	
 	    	rent.setActivity(thanksgiving);
 	    	rent.setName("Renta");
-	    	rent.setAmmount(1080);
+	    	rent.setAmount(1080);
 	    	rent.setCalculated(false);
 	    	rent.setDescription("Renta del local");
 	    	rent.setOwner(personB);
 	    	
 	    	transportation.setActivity(thanksgiving);
 	    	transportation.setName("Taxi");
-	    	transportation.setAmmount(1120);
+	    	transportation.setAmount(1120);
 	    	transportation.setCalculated(false);
 	    	transportation.setDescription("Alquiler de vehiculos");
 	    	transportation.setOwner(personC);
 	    	
 	    	food.setActivity(thanksgiving);
 	    	food.setName("Comida");
-	    	food.setAmmount(1150);
+	    	food.setAmount(1150);
 	    	food.setCalculated(false);
 	    	food.setDescription("Elaboracion de tapas");
 	    	food.setOwner(personB);
 	    	
 	    	decoration.setActivity(thanksgiving);
 	    	decoration.setName("Adornos");
-	    	decoration.setAmmount(1030);
+	    	decoration.setAmount(1030);
 	    	decoration.setCalculated(false);
 	    	decoration.setDescription("Decoracion del local");
 	    	decoration.setOwner(personB);

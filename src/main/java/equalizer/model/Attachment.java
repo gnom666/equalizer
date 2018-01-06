@@ -35,14 +35,14 @@ public class Attachment {
 
 	public Attachment() {}
 	
-	public Attachment(Task task, String name, String contentB64) {
-		this.task = task;
+	public Attachment(String name, String contentB64) {
 		this.name = name;
 		this.contentB64 = contentB64;
 		updateModified();
 	}
 	
-	public Attachment(String name, String contentB64) {
+	public Attachment(Task task, String name, String contentB64) {
+		this.task = task;
 		this.name = name;
 		this.contentB64 = contentB64;
 		updateModified();

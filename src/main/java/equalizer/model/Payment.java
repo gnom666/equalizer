@@ -46,7 +46,7 @@ public class Payment {
 	private Activity activity;
 	
 	private String modified;
-	private double ammount;
+	private double amount;
 	private PaymentStatus status;
 	
 	@Transient
@@ -69,8 +69,8 @@ public class Payment {
 		return activity;
 	}
 	
-	public double getAmmount() {
-		return ammount;
+	public double getAmount() {
+		return amount;
 	}
 
 	public Error getError() {
@@ -102,8 +102,8 @@ public class Payment {
 		updateModified();
 	}
 	
-	public void setAmmount(double ammount) {
-		this.ammount = ammount;
+	public void setAmount(double amount) {
+		this.amount = amount;
 		updateModified();
 	}
 
@@ -124,6 +124,7 @@ public class Payment {
 
 	public void setStatus(PaymentStatus pending) {
 		this.status = pending;
+		updateModified();
 	}
 
 	public void setTo(Person to) {

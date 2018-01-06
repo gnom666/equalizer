@@ -17,6 +17,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -83,6 +84,11 @@ public class Person {
 				inverseJoinColumns = @JoinColumn(name = "contactOf", referencedColumnName = "id"))
 	private List<Person> contactOf;
 	
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Registration.class)
+	@OneToOne
+	@JoinColumn(name="registration_id")
+    private Registration registration;
+	
 	private String firstName;
 
 	private String lastName;
@@ -95,16 +101,16 @@ public class Person {
 
 	@Column(unique = true, nullable = false, length = 45)
 	private String email;
+
 	@Column(nullable = false)
 	private String password;
+
 	@Column(nullable = false)
 	private boolean enabled;
-	
 	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property="id", scope=Role.class)
 	@ManyToOne
     @JoinColumn(name="role")
     private Role role;
-	
 	@Transient
 	private Error error = null;
 	
@@ -116,6 +122,22 @@ public class Person {
 		this.received = new ArrayList<>();
 		this.contacts = new ArrayList<>();
 		this.contactOf = new ArrayList<>();
+	}
+	
+	public List<Person> addToContactOf (Person person) {
+		for (Person p : contactOf) {
+			if (p.id == person.id) return contactOf;
+		}
+		contactOf.add(person);
+		return contactOf;
+	}
+	
+	public List<Person> addToContacts (Person person) {
+		for (Person p : contacts) {
+			if (p.id == person.id) return contacts;
+		}
+		contacts.add(person);
+		return contacts;
 	}
 	
 	public List<Activity> getActivities() {
@@ -173,6 +195,10 @@ public class Person {
 		return received;
 	}
 
+	public Registration getRegistration() {
+		return registration;
+	}
+
 	public Role getRole() {
 		return role;
 	}
@@ -185,6 +211,28 @@ public class Person {
 		return enabled;
 	}
 
+	public List<Person> removeFromContactOf (Person person) {
+		for (Person p : contactOf) {
+			if (p.id == person.id) {
+				contactOf.remove(p);
+				updateModified();
+				return contactOf;
+			}
+		}
+		return contactOf;
+	}
+	
+	public List<Person> removeFromContacts (Person person) {
+		for (Person p : contacts) {
+			if (p.id == person.id) {
+				contacts.remove(p);
+				updateModified();
+				return contacts;
+			}
+		}
+		return contacts;
+	}
+	
 	public void setActivities(List<Activity> activities) {
 		this.activities = activities;
 		updateModified();
@@ -192,12 +240,14 @@ public class Person {
 
 	public void setContactOf(List<Person> contactOf) {
 		this.contactOf = contactOf;
+		updateModified();
 	}
-	
+
 	public void setContacts(List<Person> contacts) {
 		this.contacts = contacts;
+		updateModified();
 	}
-	
+
 	public void setEmail(String email) {
 		this.email = email;
 		updateModified();
@@ -205,13 +255,14 @@ public class Person {
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+		updateModified();
 	}
 
 	public Person setError(Error error) {
 		this.error = error;
 		return this;
 	}
-
+	
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 		updateModified();
@@ -225,7 +276,7 @@ public class Person {
 	public void setModified(String modified) {
 		this.modified = modified;
 	}
-	
+
 	public void setNumpers(int numpers) {
 		this.numpers = numpers;
 		updateModified();
@@ -245,55 +296,24 @@ public class Person {
 		this.password = password;
 		updateModified();
 	}
-
+	
 	public void setReceived(List<Payment> received) {
 		this.received = received;
 		updateModified();
 	}
-
+	
+	public void setRegistration(Registration registration) {
+		this.registration = registration;
+	}
+	
 	public void setRole(Role role) {
 		this.role = role;
-	}
-
-	public void setTasks(List<Task> tasks) {
-		this.tasks = tasks;
 		updateModified();
 	}
 	
-	public List<Person> addToContacts (Person person) {
-		for (Person p : contacts) {
-			if (p.id == person.id) return contacts;
-		}
-		contacts.add(person);
-		return contacts;
-	}
-	
-	public List<Person> addToContactOf (Person person) {
-		for (Person p : contactOf) {
-			if (p.id == person.id) return contactOf;
-		}
-		contactOf.add(person);
-		return contactOf;
-	}
-	
-	public List<Person> removeFromContacts (Person person) {
-		for (Person p : contacts) {
-			if (p.id == person.id) {
-				contacts.remove(p);
-				return contacts;
-			}
-		}
-		return contacts;
-	}
-	
-	public List<Person> removeFromContactOf (Person person) {
-		for (Person p : contactOf) {
-			if (p.id == person.id) {
-				contactOf.remove(p);
-				return contactOf;
-			}
-		}
-		return contactOf;
+	public void setTasks(List<Task> tasks) {
+		this.tasks = tasks;
+		updateModified();
 	}
 
 	private void updateModified() {

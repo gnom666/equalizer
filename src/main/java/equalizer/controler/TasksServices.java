@@ -148,7 +148,7 @@ public class TasksServices {
     	task.setOwner(owner);
     	task.setName(tsk.name);
     	task.setDescription(tsk.description);
-    	task.setAmmount(tsk.ammount);
+    	task.setAmount(tsk.amount);
     	task.setCalculated(false);
     	
     	taskRepo.save(task);
@@ -173,8 +173,8 @@ public class TasksServices {
     	
     	task.setName(tsk.name);
     	task.setDescription(tsk.description);
-    	if (tsk.ammount != task.getAmmount()) {
-	    	task.setAmmount(tsk.ammount);
+    	if (tsk.amount != task.getAmount()) {
+	    	task.setAmount(tsk.amount);
 	    	task.setCalculated(false);
 	    	paymentsRepo.removeByActivity(task.getActivity());
 	    	task.getActivity().setCalculated(false);

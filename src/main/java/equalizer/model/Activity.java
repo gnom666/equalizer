@@ -143,6 +143,7 @@ public class Activity {
 		for (Person p : participants) {
 			if (p.getId() == person.getId()) {
 				participants.remove(p);
+				updateModified();
 				return participants;
 			}
 		}
@@ -151,6 +152,7 @@ public class Activity {
 
 	public void removeParticipants () {
 		participants.clear();
+		updateModified();
 	}
 
 	public void setCalculated(boolean calculated) {

@@ -2,17 +2,17 @@ package equalizer.controlermodel;
 
 public class Node implements Comparable<Node> {
 	public long personId;
-	public double ammount = 0.0;
+	public double amount = 0.0;
 	
 	public Node (long idp, double amm) {
 		personId = idp;
-		ammount = amm;
+		amount = amm;
 	}
 
 	@Override
 	public int compareTo(Node o) {
-		if (this.ammount < o.ammount) return -1;
-		if (this.ammount > o.ammount) return 1;
+		if (this.amount < o.amount) return -1;
+		if (this.amount > o.amount) return 1;
 		return 0;
 	}
 }

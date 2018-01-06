@@ -109,7 +109,7 @@ public class PaymentsServices {
 			row.totalPaid = 0;
 			act.getTasks().forEach(t->{
 				if (row.personId == t.getOwner().getId()) {
-					row.totalPaid += t.getAmmount();
+					row.totalPaid += t.getAmount();
 				}
 			});
 			table.add(row);
@@ -167,16 +167,16 @@ public class PaymentsServices {
 			pay.setActivity(act);
 			pay.setFrom(personRepo.findById(n.personId));
 			pay.setTo(personRepo.findById(p.personId));
-			if (n.ammount < p.ammount) {
-				pay.setAmmount(n.ammount);
-				positives.peek().ammount = round2decimals(positives.peek().ammount - n.ammount);
+			if (n.amount < p.amount) {
+				pay.setAmount(n.amount);
+				positives.peek().amount = round2decimals(positives.peek().amount - n.amount);
 				negatives.pop();
-			}	else if (n.ammount > p.ammount) {
-				pay.setAmmount(p.ammount);
-				negatives.peek().ammount = round2decimals(negatives.peek().ammount - p.ammount);
+			}	else if (n.amount > p.amount) {
+				pay.setAmount(p.amount);
+				negatives.peek().amount = round2decimals(negatives.peek().amount - p.amount);
 				positives.pop();
 			}	else { // son iguales
-				pay.setAmmount(n.ammount);
+				pay.setAmount(n.amount);
 				positives.pop();
 				negatives.pop();
 			}

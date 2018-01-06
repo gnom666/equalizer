@@ -16,18 +16,18 @@ public class PaymentOut {
 	public long to;
 	public long activity;
 	public String modified;
-	public double ammount;
+	public double amount;
 	public PaymentStatus status;
 	public Error error;
 		
-	public PaymentOut (long id, long from, long to, long activity, String modified, double ammount, PaymentStatus status
+	public PaymentOut (long id, long from, long to, long activity, String modified, double amount, PaymentStatus status
 			, Error error) {
 		this.id = id;
 		this.from = from;
 		this.to = to;
 		this.activity = activity;
 		this.modified = modified;
-		this.ammount = ammount;
+		this.amount = amount;
 		this.status = status;
 		this.error = error;
 	}
@@ -39,7 +39,7 @@ public class PaymentOut {
 			this.to = payments.getTo().getId();
 			this.activity = payments.getActivity().getId();
 			this.modified = payments.getModified();
-			this.ammount = payments.getAmmount();
+			this.amount = payments.getAmount();
 			this.status = payments.getStatus();
 			this.error = payments.getError();
 		}

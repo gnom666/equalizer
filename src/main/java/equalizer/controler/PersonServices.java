@@ -2,9 +2,19 @@ package equalizer.controler;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,12 +30,16 @@ import equalizer.controlermodel.Constants.RoleType;
 import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
 import equalizer.model.Person;
+import equalizer.model.Registration;
 import equalizer.model.Role;
 import equalizer.repository.ActivityRepository;
 import equalizer.repository.PaymentsRepository;
 import equalizer.repository.PersonRepository;
+import equalizer.repository.RegistrationRepository;
 import equalizer.repository.RoleRepository;
 import equalizer.viewmodel.PersonOut;
+
+
 
 /**
  * Person Services
@@ -47,6 +61,9 @@ public class PersonServices {
 	
 	@Autowired
 	private PaymentsRepository paymentsRepo;
+	
+	@Autowired
+	private RegistrationRepository regRepo;
 
 	@Autowired
 	private EqualizerConfiguration eConf;
@@ -403,7 +420,11 @@ public class PersonServices {
 		person.setLastName(p.lastName);
 		person.setNumpers(p.numpers);
 		person.setPassword(p.password);
-		person.setEnabled(true);
+		person.setEnabled(false);
+		
+		Registration registration = new Registration();
+		regRepo.save(registration);
+		person.setRegistration(registration);
 		
 		List<Role> roles = roleRepo.findByRoleType(RoleType.COMMON_USER);
 		if(roles == null || roles.size() < 1) {
@@ -416,6 +437,35 @@ public class PersonServices {
 		}
 		
 		personRepo.save(person);
+		
+		return new PersonOut(person).toPublic();
+    }
+	
+	/**
+	 * Send mail
+	 * @param user The email of the person
+	 * @return PersonOut 
+	 */
+	@RequestMapping(value="/sendmail", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public PersonOut sendMail(@RequestParam(value="user", defaultValue="0") String user) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		Person person = personRepo.findByEmail(user);
+		if (person == null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
+					.toPublic();
+		}
+		
+		//sendMail(person.getEmail(), "http://192.168.1.109:9003/people/enable/?pId=" + person.getId() + "&t=" + registration.getToken());
+		//Mail mailControler = new Mail();
+		//mailControler.email = person.getEmail();
+		//mailControler.text = "http://192.168.1.109:9003/people/enable/?pId=" + person.getId() + "&t=" + person.getRegistration().getToken();
+		//mailControler.run();		
+		
+		EmailService es = new EmailService();
+		es.emailSender = eConf.getJavaMailSender();
+		es.sendSimpleMessage(person.getEmail(), "Enable registration", "http://192.168.1.109:9003/people/enable/?pId=" + person.getId() + "&t=" + person.getRegistration().getToken());
 		
 		return new PersonOut(person).toPublic();
     }
@@ -473,6 +523,55 @@ public class PersonServices {
 		}
 		
 		person.setEnabled(false);
+		
+		personRepo.save(person);
+		
+		return new PersonOut(person);
+    }
+	
+	/**
+	 * Try to enable a person
+	 * @param personId The Id of the person
+	 * @param token The corresponding token
+	 * @return PersonOut
+	 */
+	@RequestMapping(value="/enable", method=RequestMethod.GET)
+    public PersonOut enablePerson(@RequestParam(value="pId", defaultValue="0") long personId, 
+    		@RequestParam(value="t", defaultValue="0") String token) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		
+		Person person = personRepo.findById(personId);
+		if (person == null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
+					.toPublic();
+		}
+		
+		if (person.getRegistration() == null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.REGISTRATION_NOT_FOUND, "Registration not found")))
+					.toPublic();
+		}
+		
+		if (!person.getRegistration().getToken().equals(token)) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.WRONG_TOKEN, "Wrong token")))
+					.toPublic();
+		}
+		
+		long diff = (new Date()).getTime() - person.getRegistration().getDate().getTime();       
+		long diffHours = diff / (60 * 60 * 1000); 
+		if (diffHours > 1) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.TOKEN_EXPIRED, "Expired token")))
+					.toPublic();
+		}
+		
+		person.setEnabled(true);
 		
 		personRepo.save(person);
 		

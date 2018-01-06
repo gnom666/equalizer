@@ -1,6 +1,22 @@
 package equalizer.controlermodel;
 
+import java.security.SecureRandom;
+
 public final class Constants {
+	
+	
+	// Maxim: Copied from UUID implementation :)
+    private static volatile SecureRandom numberGenerator = null;
+    private static final long MSB = 0x8000000000000000L;
+
+    public static String unique() {
+        SecureRandom ng = numberGenerator;
+        if (ng == null) {
+            numberGenerator = ng = new SecureRandom();
+        }
+
+        return Long.toHexString(MSB | ng.nextLong()) + Long.toHexString(MSB | ng.nextLong());
+    } 
 	
 	public static enum LogLevel {
 		NONE,
@@ -50,6 +66,7 @@ public final class Constants {
 	    ACTIVITY_NOT_FOUND,
 	    PAYMENT_NOT_FOUND,
 		PERSON_NOT_FOUND,
+		REGISTRATION_NOT_FOUND,
 		TASK_NOT_FOUND,
 		ATTACHMENT_NOT_FOUND,
 		ACTIVITYOWNER_MISSMATCH,
@@ -60,7 +77,10 @@ public final class Constants {
 		INCORRECT_PASSWORD,
 		BAD_DATE_FORMAT,
 		EXISTENT_DATA,
-		PERSON_DISABLED
+		PERSON_DISABLED,
+		WRONG_TOKEN,
+		TOKEN_EXPIRED,
+		USER_ENABLED
 	}
 	
 	public static String errorTypeName (ErrorType type) {
@@ -75,6 +95,9 @@ public final class Constants {
 			break;
 		case PERSON_NOT_FOUND:
 			typeName = "PERSON_NOT_FOUND";
+			break;
+		case REGISTRATION_NOT_FOUND:
+			typeName = "REGISTRATION_NOT_FOUND";
 			break;
 		case TASK_NOT_FOUND:
 			typeName = "TASK_NOT_FOUND";
@@ -108,6 +131,15 @@ public final class Constants {
 			break;
 		case ATTACHMENT_NOT_FOUND:
 			typeName = "ATTACHMENT_NOT_FOUND";
+			break;
+		case TOKEN_EXPIRED:
+			typeName = "TOKEN_EXPIRED";
+			break;
+		case WRONG_TOKEN:
+			typeName = "WRONG_TOKEN";
+			break;
+		case USER_ENABLED:
+			typeName = "USER_ENABLED";
 			break;
 		default:
 			typeName = "UNKNOWN";
@@ -189,5 +221,28 @@ public final class Constants {
 			case 3: return RoleType.ADVANCED_USER;
 			default: return RoleType.GUEST;
 		}
+	}
+	
+	public static enum RegistrationStatus {
+		PENDING,
+		OK,
+		ERROR
+	}
+	
+	public static String registrationStatusName (RegistrationStatus status) {
+		
+		String statusName = "";
+		switch (status) {
+			case PENDING:
+				statusName = "PENDING";
+				break;
+			case OK:
+				statusName = "OK";
+				break;
+			case ERROR:
+			default:
+				statusName = "ERROR";
+		}
+		return statusName;
 	}
 }

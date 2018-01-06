@@ -51,7 +51,7 @@ public class Task {
 
 	private String modified;
 	private boolean calculated;
-	private double ammount;
+	private double amount;
 
 	@Transient
 	private Error error = null;
@@ -65,8 +65,8 @@ public class Task {
 		return activity;
 	}
 	
-	public double getAmmount() {
-		return ammount;
+	public double getAmount() {
+		return amount;
 	}
 
 	/*@PreRemove
@@ -112,13 +112,14 @@ public class Task {
 		updateModified();
 	}
 	
-	public void setAmmount(double ammount) {
-		this.ammount = ammount;
+	public void setAmount(double amount) {
+		this.amount = amount;
 		updateModified();
 	}
 
 	public void setAttachment(Attachment attachment) {
 		this.attachment = attachment;
+		updateModified();
 	}
 
 	public void setCalculated(boolean calculated) {
@@ -128,6 +129,7 @@ public class Task {
 
 	public void setDescription(String description) {
 		this.description = description;
+		updateModified();
 	}
 
 	public Task setError(Error error) {
