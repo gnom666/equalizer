@@ -4,6 +4,14 @@ import java.security.SecureRandom;
 
 public final class Constants {
 	
+	public static String IP_HOME = "192.168.1.109";
+    public static String IP_WORK = "10.23.51.45";
+    public static String IP_EC2 = "52.47.157.126";
+    public static String DNS_GLOBAL = "ec2-52-47-157-126.eu-west-3.compute.amazonaws.com";
+    public static String IP = DNS_GLOBAL;
+    public static String PORT = "9003";
+    
+    
 	
 	// Maxim: Copied from UUID implementation :)
     private static volatile SecureRandom numberGenerator = null;
@@ -225,6 +233,7 @@ public final class Constants {
 	
 	public static enum RegistrationStatus {
 		PENDING,
+		SENT,
 		OK,
 		ERROR
 	}
@@ -235,6 +244,9 @@ public final class Constants {
 		switch (status) {
 			case PENDING:
 				statusName = "PENDING";
+				break;
+			case SENT:
+				statusName = "SENT";
 				break;
 			case OK:
 				statusName = "OK";

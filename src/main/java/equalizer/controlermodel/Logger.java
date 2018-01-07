@@ -40,4 +40,14 @@ public class Logger {
 		}
 	}
 	
+	public void error(Class<?> className, String functionName) {
+		String text = "[" + functionName + "]: ";
+		LogFactory.getLog(className).error(text);
+	}
+	
+	public void error(Class<?> className, String functionName, String extra) {
+		String text = "[" + functionName + "]: " + extra;
+		LogFactory.getLog(className).error(text);
+	}
+	
 }

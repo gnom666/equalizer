@@ -124,7 +124,7 @@ public class GeneralServices {
 	    	personA.setEmail("a@eq.com");
 	    	personA.setNumpers(1);
 	    	personA.setRole(roleAdm);
-	    	personA.setEnabled(false);
+	    	personA.setEnabled(true);
 	    	registration = new Registration();
 	    	regRepo.save(registration);
 	    	personA.setRegistration(registration);
@@ -135,7 +135,7 @@ public class GeneralServices {
 	    	personB.setEmail("b@eq.com");
 	    	personB.setNumpers(2);
 	    	personB.setRole(roleCUser);
-	    	personB.setEnabled(false);
+	    	personB.setEnabled(true);
 	    	registration = new Registration();
 	    	regRepo.save(registration);
 	    	personB.setRegistration(registration);
@@ -146,7 +146,7 @@ public class GeneralServices {
 	    	personC.setEmail("c@eq.com");
 	    	personC.setNumpers(2);
 	    	personC.setRole(roleCUser);
-	    	personC.setEnabled(false);
+	    	personC.setEnabled(true);
 	    	registration = new Registration();
 	    	regRepo.save(registration);
 	    	personC.setRegistration(registration);
@@ -157,7 +157,7 @@ public class GeneralServices {
 	    	personD.setEmail("d@eq.com");
 	    	personD.setNumpers(3);
 	    	personD.setRole(roleCUser);
-	    	personD.setEnabled(false);
+	    	personD.setEnabled(true);
 	    	registration = new Registration();
 	    	regRepo.save(registration);
 	    	personD.setRegistration(registration);
@@ -168,7 +168,7 @@ public class GeneralServices {
 	    	personE.setEmail("e@eq.com");
 	    	personE.setNumpers(1);
 	    	personE.setRole(roleGuest);
-	    	personE.setEnabled(false);
+	    	personE.setEnabled(true);
 	    	registration = new Registration();
 	    	regRepo.save(registration);
 	    	personE.setRegistration(registration);

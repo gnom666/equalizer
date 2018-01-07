@@ -1,5 +1,7 @@
 package equalizer.controler;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,8 +26,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import equalizer.config.EqualizerConfiguration;
+import equalizer.controlermodel.Constants;
 import equalizer.controlermodel.Constants.ErrorCode;
 import equalizer.controlermodel.Constants.ErrorType;
+import equalizer.controlermodel.Constants.RegistrationStatus;
 import equalizer.controlermodel.Constants.RoleType;
 import equalizer.controlermodel.Error;
 import equalizer.model.Activity;
@@ -462,10 +466,20 @@ public class PersonServices {
 		//mailControler.email = person.getEmail();
 		//mailControler.text = "http://192.168.1.109:9003/people/enable/?pId=" + person.getId() + "&t=" + person.getRegistration().getToken();
 		//mailControler.run();		
-		
-		EmailService es = new EmailService();
-		es.emailSender = eConf.getJavaMailSender();
-		es.sendSimpleMessage(person.getEmail(), "Enable registration", "http://192.168.1.109:9003/people/enable/?pId=" + person.getId() + "&t=" + person.getRegistration().getToken());
+		if (person.getRegistration().getStatus() == RegistrationStatus.PENDING) {
+			String IP = Constants.IP;
+			/*try {
+				IP = InetAddress.getLocalHost().getHostName();
+			}	catch (UnknownHostException e) {
+				eConf.logger().error(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName(), e.getMessage());
+			}*/
+			EmailService es = new EmailService();
+			es.emailSender = eConf.getJavaMailSender();
+			es.sendSimpleMessage(person.getEmail(), "Enable registration", "http://" + IP + ":" + Constants.PORT + "/people/enable/?pId=" + person.getId() + "&t=" + person.getRegistration().getToken());
+			
+			person.getRegistration().setStatus(RegistrationStatus.SENT);
+			regRepo.save(person.getRegistration());
+		}
 		
 		return new PersonOut(person).toPublic();
     }
@@ -533,48 +547,54 @@ public class PersonServices {
 	 * Try to enable a person
 	 * @param personId The Id of the person
 	 * @param token The corresponding token
-	 * @return PersonOut
+	 * @return String
 	 */
 	@RequestMapping(value="/enable", method=RequestMethod.GET)
-    public PersonOut enablePerson(@RequestParam(value="pId", defaultValue="0") long personId, 
-    		@RequestParam(value="t", defaultValue="0") String token) {
+    public String enablePerson(@RequestParam(value="pId", defaultValue="0") long personId, 
+    		@RequestParam(value="t", defaultValue="") String token) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		
 		Person person = personRepo.findById(personId);
 		if (person == null) {
-			return new PersonOut(
-					new Person()
-					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
-					.toPublic();
+			return "Person not found";
 		}
 		
 		if (person.getRegistration() == null) {
-			return new PersonOut(
-					new Person()
-					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.REGISTRATION_NOT_FOUND, "Registration not found")))
-					.toPublic();
+			return "Registration not found";
 		}
 		
 		if (!person.getRegistration().getToken().equals(token)) {
-			return new PersonOut(
-					new Person()
-					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.WRONG_TOKEN, "Wrong token")))
-					.toPublic();
+			return "Wrong token";
+		}
+		
+		if (person.isEnabled()) {
+			return "Already enabled";
 		}
 		
 		long diff = (new Date()).getTime() - person.getRegistration().getDate().getTime();       
 		long diffHours = diff / (60 * 60 * 1000); 
-		if (diffHours > 1) {
-			return new PersonOut(
-					new Person()
-					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.TOKEN_EXPIRED, "Expired token")))
-					.toPublic();
+		if (diffHours > 2) {
+			Registration old = person.getRegistration();
+			person.setRegistration(null);
+			personRepo.save(person);
+			regRepo.delete(old);
+			Registration registration = new Registration();
+			regRepo.save(registration);
+			person.setRegistration(registration);
+			personRepo.save(person);
+			String IP = Constants.IP;
+			/*try {
+				IP = InetAddress.getLocalHost().getHostName();
+			}	catch (UnknownHostException e) {
+				eConf.logger().error(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName(), e.getMessage());
+			}*/
+			return "Expired token, try this: " + "http://" + IP + ":" + Constants.PORT + "/people/enable/?pId=" + person.getId() + "&t=" + person.getRegistration().getToken();
 		}
 		
 		person.setEnabled(true);
 		
 		personRepo.save(person);
 		
-		return new PersonOut(person);
+		return "User enabled";
     }
 }
