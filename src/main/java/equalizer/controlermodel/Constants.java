@@ -234,6 +234,7 @@ public final class Constants {
 	public static enum RegistrationStatus {
 		PENDING,
 		SENT,
+		FORGOTTEN,
 		OK,
 		ERROR
 	}

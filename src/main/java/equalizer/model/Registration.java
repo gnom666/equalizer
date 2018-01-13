@@ -43,6 +43,11 @@ public class Registration {
 		this.date = new Date();
 		this.status = RegistrationStatus.PENDING;
 	}
+	
+	public void regenerateToken () {
+		this.token = Constants.unique();
+		this.date = new Date();
+	}
 
 	public Date getDate() {
 		return date;

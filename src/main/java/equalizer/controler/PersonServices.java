@@ -389,6 +389,17 @@ public class PersonServices {
 							.toPublic();
 				}
 			}	else {
+				if (person.getRegistration() != null) {
+					person.getRegistration().regenerateToken();
+					person.getRegistration().setStatus(RegistrationStatus.FORGOTTEN);
+					regRepo.save(person.getRegistration());
+				}	else {
+					Registration registration = new Registration();
+					registration.setStatus(RegistrationStatus.FORGOTTEN);
+					regRepo.save(registration);
+					person.setRegistration(registration);
+				}
+				personRepo.save(person);
 				return new PersonOut(
 						new Person()
 						.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.INCORRECT_PASSWORD, "Incorrect password")))
@@ -446,9 +457,51 @@ public class PersonServices {
     }
 	
 	/**
+	 * Add a new Person
+	 * @param p The Person
+	 * @return {@link PersonOut}
+	 */
+	@RequestMapping(value="/addgoogleuser", method=RequestMethod.POST)
+    public PersonOut addGoogleUser(@RequestBody PersonOut p) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		Person person = personRepo.findByEmail(p.email);
+		
+		if (person != null) {
+			return new PersonOut(person).toPublic();
+		}
+		
+		person = new Person();
+		person.setEmail(p.email);
+		person.setFirstName(p.firstName);
+		person.setLastName(p.lastName);
+		person.setNumpers(p.numpers);
+		person.setPassword(p.password);
+		person.setEnabled(true);
+		
+		Registration registration = new Registration();
+		registration.setStatus(RegistrationStatus.OK);
+		regRepo.save(registration);
+		person.setRegistration(registration);
+		
+		List<Role> roles = roleRepo.findByRoleType(RoleType.COMMON_USER);
+		if(roles == null || roles.size() < 1) {
+			Role role = new Role();
+			role.setRoleType(RoleType.COMMON_USER);
+			roleRepo.save(role);
+			person.setRole(role);
+		}	else {
+			person.setRole(roles.get(0));
+		}
+		
+		personRepo.save(person);
+		
+		return new PersonOut(person).toPublic();
+    }
+	
+	/**
 	 * Send mail
 	 * @param user The email of the person
-	 * @return PersonOut 
+	 * @return {@link PersonOut} 
 	 */
 	@RequestMapping(value="/sendmail", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public PersonOut sendMail(@RequestParam(value="user", defaultValue="0") String user) {
@@ -479,6 +532,38 @@ public class PersonServices {
 			
 			person.getRegistration().setStatus(RegistrationStatus.SENT);
 			regRepo.save(person.getRegistration());
+			personRepo.save(person);
+		}
+		
+		return new PersonOut(person).toPublic();
+    }
+	
+	/**
+	 * Send token
+	 * @param user The email of the person
+	 * @return PersonOut 
+	 */
+	@RequestMapping(value="/sendtoken", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public PersonOut sendToken(@RequestParam(value="user", defaultValue="0") String user) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		Person person = personRepo.findByEmail(user);
+		if (person == null) {
+			return new PersonOut(
+					new Person()
+					.setError(eConf.lastError().updateError(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person not found")))
+					.toPublic();
+		}
+		
+		if (person.getRegistration().getStatus() == RegistrationStatus.FORGOTTEN) {
+			String IP = Constants.IP;
+
+			EmailService es = new EmailService();
+			es.emailSender = eConf.getJavaMailSender();
+			es.sendSimpleMessage(person.getEmail(), "Password reset token", person.getRegistration().getToken());
+			
+			person.getRegistration().setStatus(RegistrationStatus.SENT);
+			regRepo.save(person.getRegistration());
+			personRepo.save(person);
 		}
 		
 		return new PersonOut(person).toPublic();
@@ -592,7 +677,8 @@ public class PersonServices {
 		}
 		
 		person.setEnabled(true);
-		
+		person.getRegistration().setStatus(RegistrationStatus.OK);
+		regRepo.save(person.getRegistration());
 		personRepo.save(person);
 		
 		return "User enabled";

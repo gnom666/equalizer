@@ -2,7 +2,9 @@
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Attachment.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/viewmodel/PaymentOut.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/config/ResourceServerConfig.java
+/home/jorgerios/git/equalizer/src/main/java/equalizer/controler/EmailService.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/controler/PaymentsServices.java
+/home/jorgerios/git/equalizer/src/main/java/equalizer/repository/RegistrationRepository.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/controlermodel/Logger.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/viewmodel/TaskOut.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Role.java
@@ -16,6 +18,7 @@
 /home/jorgerios/git/equalizer/src/main/java/equalizer/controlermodel/Table.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/repository/ActivityRepository.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/viewmodel/RoleOut.java
+/home/jorgerios/git/equalizer/src/main/java/equalizer/controler/Mail.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/Application.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/config/AuthorizationServerConfig.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Task.java
@@ -25,6 +28,7 @@
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Activity.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Person.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/repository/PersonRepository.java
+/home/jorgerios/git/equalizer/src/main/java/equalizer/model/Registration.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/viewmodel/AttachmentOut.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/controler/TasksServices.java
 /home/jorgerios/git/equalizer/src/main/java/equalizer/model/Payment.java
