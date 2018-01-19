@@ -145,7 +145,7 @@ public class ActivitiesServices {
 		activity.setName(act.name);
 		activity.setDescription(act.description);
 		
-		DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+		DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
 		try {
 			activity.setDate(format.parse(act.date));
 		} 	catch (ParseException e) {

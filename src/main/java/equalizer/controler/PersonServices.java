@@ -283,7 +283,7 @@ public class PersonServices {
 		personRepo.save(person1);
 		personRepo.save(person2);
 		
-		return new PersonOut(person2);
+		return new PersonOut(person2).toPublic();
     }
 	
 	/**
@@ -299,6 +299,42 @@ public class PersonServices {
 		List<PersonOut> friends = new ArrayList<>();		
 		Person person1 = personRepo.findById(id1);
 		Person person2 = personRepo.findById(id2);
+		Error error = new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person with id not found");
+		
+		if (person1 != null) {
+			friends.add(new PersonOut(person1));
+		}	else {
+			friends.add(new PersonOut(new Person().setError(error)));
+		}
+		if (person2 != null) {
+			friends.add(new PersonOut(person2));
+		}	else {
+			friends.add(new PersonOut(new Person().setError(error)));
+		}
+		if (person1 != null && person2 != null) {
+			person1.removeFromContacts(person2);
+			//person1.removeFromContactOf(person2);
+			person2.removeFromContacts(person1);
+			//person2.removeFromContactOf(person1);
+			personRepo.save(person1);
+			personRepo.save(person2);
+		}
+		return friends;
+    }
+	
+	/**
+	 * Unsets friends A-x>B and B-x>A
+	 * @param id1 Person A id
+	 * @param id2 Person B id
+	 * @return List<PersonOut>
+	 */
+	@RequestMapping(value="/unsetfriendsbyemail", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PersonOut> unsetFriendsByEmail(@RequestParam(value="person1Id", defaultValue="0") long id, 
+    									@RequestParam(value="person2email", defaultValue="") String email) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		List<PersonOut> friends = new ArrayList<>();		
+		Person person1 = personRepo.findById(id);
+		Person person2 = personRepo.findByEmail(email);
 		Error error = new Error(ErrorCode.PERSON_SERVICES, ErrorType.PERSON_NOT_FOUND, "Person with id not found");
 		
 		if (person1 != null) {
