@@ -97,6 +97,8 @@ public class PaymentsServices {
 		}
 		if (redo) {
 			/*deletedPayments = */paymentsRepo.removeByActivity(act);
+		}	else if (act.isCalculated()) {
+			return paymentsRepo.findByActivity(act);
 		}
 		
 		//*/
@@ -205,13 +207,13 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/generatepayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
     public List<PaymentOut> generatePayments(@RequestParam(value="aId", defaultValue="0") long activityId, 
-								    		 @RequestParam(value="pId", defaultValue="") long personId, 
+								    		 @RequestParam(value="pId", defaultValue="0") long personId, 
 								    		 @RequestParam(value="redo", defaultValue="false") boolean reDo) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		List<PaymentOut> result = new ArrayList<>();
 		Activity act = activityRepo.findById(activityId);
 		Person per = personRepo.findById(personId);
-		if (act != null && per!= null && per.getEmail() == act.getOwner().getEmail()) {
+		if (act != null && per != null && per.getEmail() == act.getOwner().getEmail()) {
 			
 			calculatePayments(act, per, reDo).forEach(p->result.add(new PaymentOut(p)));
 						
@@ -236,6 +238,40 @@ public class PaymentsServices {
 			result.add(	new PaymentOut(
 					new Payment()
 					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITYOWNER_MISSMATCH, "Person Id is different than actuvity owner Id"))));
+		}
+		
+		return result;
+    }
+	
+	/**
+	 * Generates an activity's payments
+	 * @param activityId The Id of the activity
+	 * @param reDo Re-do or not the calculations
+	 * @return List of PaymentOut
+	 */
+	@RequestMapping(value="/calculatepayments", method=RequestMethod.GET, produces="application/json;charset=UTF-8")
+    public List<PaymentOut> calculatePayments(@RequestParam(value="aId", defaultValue="0") long activityId, 
+								    		 @RequestParam(value="redo", defaultValue="false") boolean reDo) {
+		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
+		List<PaymentOut> result = new ArrayList<>();
+		Activity act = activityRepo.findById(activityId);
+		if (act != null) {
+			
+			calculatePayments(act, act.getOwner(), reDo).forEach(p->result.add(new PaymentOut(p)));
+						
+			act.setCalculated(true);
+			activityRepo.save(act);
+			
+			act.getTasks().forEach(t->{
+				t.setCalculated(true);
+				taskRepo.save(t);
+			});
+		}
+		
+		if (act == null) {
+			result.add(	new PaymentOut(
+					new Payment()
+					.setError(eConf.lastError().updateError(ErrorCode.PAYMENTS_SERVICES, ErrorType.ACTIVITY_NOT_FOUND, "Activity Id not found"))));
 		}
 		
 		return result;
@@ -368,7 +404,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/makepay", method=RequestMethod.GET)
     public PaymentOut makePayment(@RequestParam(value="fId", defaultValue="0") long fromId, 
-    							  @RequestParam(value="pId", defaultValue="") long paymentId) {
+    							  @RequestParam(value="pId", defaultValue="0") long paymentId) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(fromId);
 		Payment payment = paymentsRepo.findById(paymentId);
@@ -399,7 +435,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/acceptpay", method=RequestMethod.GET)
     public PaymentOut acceptPayment(@RequestParam(value="tId", defaultValue="0") long toId, 
-    								@RequestParam(value="pId", defaultValue="") long paymentId) {
+    								@RequestParam(value="pId", defaultValue="0") long paymentId) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(toId);
 		Payment payment = paymentsRepo.findById(paymentId);
@@ -430,7 +466,7 @@ public class PaymentsServices {
 	 */
 	@RequestMapping(value="/suepay", method=RequestMethod.GET)
     public PaymentOut suePayment(@RequestParam(value="tId", defaultValue="0") long toId, 
-    							 @RequestParam(value="pId", defaultValue="") long paymentId) {
+    							 @RequestParam(value="pId", defaultValue="0") long paymentId) {
 		eConf.logger().log(this.getClass(), new Object(){}.getClass().getEnclosingMethod().getName());
 		Person person = personRepo.findById(toId);
 		Payment payment = paymentsRepo.findById(paymentId);
